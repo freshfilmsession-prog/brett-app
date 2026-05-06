@@ -1,0 +1,1993 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brett Wild laboratory — Brett Lab v3</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+  :root{--bg:#0a0805;--bg2:#110e09;--bg3:#1a1410;--bg4:#221c15;--bg5:#2e261c;--accent:#c8922a;--accent2:#e8b84b;--accent3:#8b5e1a;--brett:#6b8c42;--brett2:#8ab854;--brett3:#4a6230;--text:#f0e6d3;--text2:#c4b49a;--text3:#8a7a65;--text4:#5a4e3f;--red:#c44a2a;--blue:#3a6a8c;--blue2:#6ab0d4;--border:rgba(200,146,42,0.2);--border2:rgba(200,146,42,0.08);--glow:rgba(200,146,42,0.15);--brett-glow:rgba(107,140,66,0.15);--shadow:0 8px 32px rgba(0,0,0,0.6);}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Crimson Pro',serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.4;}
+  /* SIDEBAR */
+  .sidebar{position:fixed;left:0;top:0;bottom:0;width:260px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:200;overflow-y:auto;transition:transform .3s ease;}
+  .sidebar-logo{padding:24px 24px 18px;border-bottom:1px solid var(--border2);}
+  .logo-octo{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;letter-spacing:4px;color:var(--accent);text-transform:uppercase;opacity:.8;}
+  .logo-main{font-family:'Playfair Display',serif;font-size:21px;font-weight:900;color:var(--text);line-height:1.1;margin:4px 0 2px;}
+  .logo-sub{font-family:'Space Mono',monospace;font-size:9px;color:var(--brett2);letter-spacing:2px;text-transform:uppercase;}
+  .logo-icon{font-size:34px;margin-bottom:6px;display:block;}
+  .nav-section{padding:12px 0;border-bottom:1px solid var(--border2);}
+  .nav-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--text4);text-transform:uppercase;padding:0 24px 8px;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 24px;cursor:pointer;transition:all .2s;color:var(--text3);font-size:14px;border-left:2px solid transparent;}
+  .nav-item:hover{color:var(--text);background:var(--border2);}
+  .nav-item.active{color:var(--accent2);background:var(--glow);border-left-color:var(--accent);}
+  .nav-item .nav-icon{font-size:15px;width:20px;text-align:center;}
+  .nav-badge{margin-left:auto;background:var(--accent3);color:var(--accent2);font-family:'Space Mono',monospace;font-size:10px;padding:1px 6px;border-radius:10px;}
+  .hamburger{display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px;}
+  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:150;}
+  /* MAIN */
+  .main{margin-left:260px;min-height:100vh;display:flex;flex-direction:column;}
+  .topbar{height:60px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100;}
+  .topbar-left{display:flex;align-items:center;gap:12px;}
+  .topbar-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text);}
+  .topbar-actions{display:flex;gap:8px;align-items:center;}
+  /* BUTTONS */
+  .btn{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;padding:8px 16px;border-radius:4px;border:none;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+  .btn-primary{background:var(--accent);color:var(--bg);font-weight:700;}
+  .btn-primary:hover{background:var(--accent2);transform:translateY(-1px);}
+  .btn-ghost{background:transparent;color:var(--text3);border:1px solid var(--border);}
+  .btn-ghost:hover{color:var(--text);border-color:var(--accent3);}
+  .btn-brett{background:var(--brett3);color:var(--brett2);border:1px solid var(--brett);}
+  .btn-brett:hover{background:var(--brett);color:var(--bg);}
+  .btn-danger{background:transparent;color:var(--red);border:1px solid rgba(196,74,42,.3);font-size:10px;padding:5px 12px;}
+  .btn-danger:hover{background:rgba(196,74,42,.15);}
+  .btn-cellar{background:rgba(58,106,140,.15);color:var(--blue2);border:1px solid rgba(58,106,140,.4);}
+  .btn-cellar:hover{background:rgba(58,106,140,.3);}
+  .btn-sm{padding:5px 12px;font-size:10px;}
+  /* PAGES */
+  .page{display:none;padding:24px;animation:fadeIn .3s ease;}
+  .page.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  /* STATS */
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px;}
+  .stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:18px;position:relative;overflow:hidden;}
+  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));}
+  .stat-card.brett::before{background:linear-gradient(90deg,var(--brett3),var(--brett2));}
+  .stat-card.cellar::before{background:linear-gradient(90deg,#2a5f8c,var(--blue2));}
+  .stat-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--text4);text-transform:uppercase;margin-bottom:6px;}
+  .stat-value{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--accent2);line-height:1;}
+  .stat-card.brett .stat-value{color:var(--brett2);}
+  .stat-card.cellar .stat-value{color:var(--blue2);}
+  .stat-sub{font-size:12px;color:var(--text4);margin-top:4px;}
+  .stat-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:28px;opacity:.15;}
+  /* SECTIONS */
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+  .section-title{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;color:var(--text);}
+  .section-sub{font-family:'Space Mono',monospace;font-size:10px;color:var(--text4);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+  /* BEER CARDS */
+  .beer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:26px;}
+  .beer-card{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;overflow:hidden;cursor:pointer;transition:all .25s;}
+  .beer-card:hover{border-color:var(--accent3);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.5);}
+  /* LABEL AS FULL ETIQUETA */
+  .beer-card-label{background:var(--bg4);display:flex;align-items:center;justify-content:center;min-height:160px;max-height:250px;padding:12px;position:relative;overflow:hidden;}
+  .beer-card-label img{max-width:100%;max-height:230px;width:auto;height:auto;object-fit:contain;border-radius:3px;box-shadow:0 4px 20px rgba(0,0,0,.7);}
+  .beer-card-label-placeholder{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text4);font-size:32px;}
+  .beer-card-label-placeholder span{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;}
+  .beer-style-badge{position:absolute;top:8px;right:8px;background:rgba(10,8,5,.88);color:var(--brett2);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:20px;border:1px solid var(--brett3);text-transform:uppercase;}
+  .beer-card-body{padding:14px;}
+  .beer-card-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:3px;}
+  .beer-card-vintage{font-family:'Space Mono',monospace;font-size:10px;color:var(--text4);letter-spacing:2px;margin-bottom:10px;}
+  .beer-card-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding-top:10px;border-top:1px solid var(--border2);}
+  .beer-mini-stat .val{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--accent);text-align:center;}
+  .beer-mini-stat .lbl{font-size:9px;color:var(--text4);font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase;text-align:center;}
+  .beer-card-footer{padding:10px 14px;background:var(--bg4);border-top:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center;}
+  .btn-edit-card{background:transparent;color:var(--text4);border:1px solid var(--border2);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:3px;cursor:pointer;text-transform:uppercase;transition:all .2s;flex-shrink:0;}
+  .btn-edit-card:hover{color:var(--accent2);border-color:var(--accent3);}
+  .cellar-liters-big{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--blue2);}
+  .cellar-liters-sub{font-family:'Space Mono',monospace;font-size:9px;color:var(--text4);letter-spacing:1px;}
+  /* STATUS */
+  .status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;}
+  .status-dot.fermenting{background:var(--brett2);animation:pulse 2s infinite;}
+  .status-dot.aging{background:var(--accent);}
+  .status-dot.ready{background:#4aab6a;}
+  .status-dot.concept{background:var(--text4);}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .status-text{font-family:'Space Mono',monospace;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;}
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:1000;display:none;align-items:flex-start;justify-content:center;padding:20px 12px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--bg2);border:1px solid var(--border);border-radius:12px;width:100%;max-width:860px;box-shadow:var(--shadow);}
+  .modal-header{padding:18px 22px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .modal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--text);}
+  .modal-header-actions{display:flex;gap:8px;align-items:center;flex-shrink:0;}
+  .modal-close{background:none;border:none;color:var(--text3);font-size:26px;cursor:pointer;padding:0 4px;line-height:1;}
+  .modal-close:hover{color:var(--text);}
+  .modal-body{padding:22px;}
+  .modal-body-scroll{padding:22px;overflow-y:auto;-webkit-overflow-scrolling:touch;max-height:82vh;}
+  /* Modal as flex column so footer can be sticky */
+  .modal{background:var(--bg2);border:1px solid var(--border);border-radius:12px;width:100%;max-width:860px;box-shadow:var(--shadow);display:flex;flex-direction:column;max-height:95vh;}
+  .modal-body-scroll{flex:1;min-height:0;}
+  .modal-footer-sticky{padding:14px 22px;border-top:1px solid var(--border2);background:var(--bg2);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;z-index:10;}
+  /* FORMS */
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+  .form-full{grid-column:1/-1;}
+  .form-group{display:flex;flex-direction:column;gap:5px;}
+  .form-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;}
+  .form-input,.form-select,.form-textarea{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:'Crimson Pro',serif;font-size:15px;padding:9px 12px;transition:border-color .2s;outline:none;width:100%;}
+  .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--glow);}
+  .form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23c8922a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+  .form-textarea{resize:vertical;min-height:78px;line-height:1.6;}
+  .form-hint{font-size:11px;color:var(--text4);font-style:italic;}
+  /* INGREDIENTS TABLE */
+  .ing-table{width:100%;border-collapse:collapse;margin-bottom:10px;}
+  .ing-table th{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text4);text-transform:uppercase;padding:7px 6px;text-align:left;border-bottom:1px solid var(--border2);}
+  .ing-table td{padding:4px 3px;vertical-align:middle;}
+  .ing-table td input,.ing-table td select{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:'Crimson Pro',serif;font-size:13px;padding:5px 7px;width:100%;outline:none;}
+  .ing-table td input:focus,.ing-table td select:focus{border-color:var(--accent3);}
+  .ing-table tr:not(:last-child) td{border-bottom:1px solid var(--border2);}
+  /* DETAIL */
+  .detail-header{display:grid;grid-template-columns:auto 1fr;gap:28px;margin-bottom:22px;align-items:start;}
+  .detail-label-img{max-width:200px;max-height:300px;width:auto;height:auto;object-fit:contain;border-radius:8px;border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,.6);}
+  .detail-label-placeholder{width:170px;height:230px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--text4);font-size:38px;}
+  .detail-style-tag{display:inline-block;background:var(--brett-glow);color:var(--brett2);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;padding:4px 12px;border-radius:20px;border:1px solid var(--brett3);text-transform:uppercase;margin-bottom:10px;}
+  .detail-name{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--text);line-height:1;margin-bottom:6px;}
+  .detail-vintage{font-family:'Space Mono',monospace;font-size:11px;color:var(--text4);letter-spacing:2px;margin-bottom:12px;}
+  .detail-desc{font-size:16px;color:var(--text2);line-height:1.7;font-style:italic;margin-bottom:14px;}
+  .detail-stats-row{display:flex;gap:10px;flex-wrap:wrap;}
+  .detail-stat{text-align:center;padding:9px 14px;background:var(--bg3);border-radius:6px;border:1px solid var(--border2);min-width:64px;}
+  .detail-stat .val{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--accent2);line-height:1;}
+  .detail-stat .lbl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text4);text-transform:uppercase;margin-top:3px;}
+  .detail-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:18px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .detail-tab{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:10px 14px;cursor:pointer;color:var(--text4);border-bottom:2px solid transparent;transition:all .2s;background:none;border-top:none;border-left:none;border-right:none;white-space:nowrap;}
+  .detail-tab:hover{color:var(--text2);}
+  .detail-tab.active{color:var(--accent2);border-bottom-color:var(--accent);}
+  .tab-content{display:none;}.tab-content.active{display:block;}
+  /* ING DISPLAY */
+  .ing-section{margin-bottom:18px;}
+  .ing-section-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--accent2);margin-bottom:8px;}
+  .ing-list{display:flex;flex-direction:column;gap:5px;}
+  .ing-item{display:flex;align-items:center;padding:9px 12px;background:var(--bg3);border-radius:5px;border-left:3px solid var(--accent3);gap:12px;font-size:14px;}
+  .ing-item.brett-yeast{border-left-color:var(--brett);background:rgba(107,140,66,.05);}
+  .ing-name{color:var(--text);flex:1;font-weight:600;}
+  .ing-amount{font-family:'Space Mono',monospace;font-size:12px;color:var(--accent);}
+  .ing-detail{font-size:12px;color:var(--text4);font-style:italic;}
+  /* TIMELINE */
+  .timeline{position:relative;padding-left:26px;}
+  .timeline::before{content:'';position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:linear-gradient(180deg,var(--accent3),var(--brett3));}
+  .timeline-step{position:relative;margin-bottom:16px;}
+  .timeline-step::before{content:'';position:absolute;left:-22px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);box-shadow:0 0 8px var(--accent);}
+  .timeline-step.brett::before{background:var(--brett2);box-shadow:0 0 8px var(--brett2);}
+  .timeline-title{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;}
+  .timeline-content{background:var(--bg3);border-radius:6px;padding:10px 12px;font-size:14px;color:var(--text2);line-height:1.6;border:1px solid var(--border2);}
+  /* CALCULATORS */
+  .calc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;}
+  .calc-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+  .calc-header{padding:14px 18px;background:var(--bg4);border-bottom:1px solid var(--border2);}
+  .calc-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--text);margin-bottom:2px;}
+  .calc-desc{font-size:12px;color:var(--text4);font-style:italic;}
+  .calc-body{padding:18px;}
+  .calc-result{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:14px;text-align:center;margin-top:12px;}
+  .calc-result-value{font-family:'Playfair Display',serif;font-size:38px;font-weight:900;color:var(--accent2);line-height:1;}
+  .calc-result-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--text4);letter-spacing:3px;text-transform:uppercase;margin-top:4px;}
+  .srm-display{height:54px;border-radius:6px;margin-top:10px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;transition:all .3s;}
+  .attenuation-bar{height:20px;background:var(--bg4);border-radius:10px;overflow:hidden;margin:8px 0;}
+  .attenuation-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--brett3),var(--brett2));transition:width .4s;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:'Space Mono',monospace;font-size:10px;color:var(--bg);font-weight:700;}
+  /* REFERENCE */
+  .ref-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;}
+  .ref-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+  .ref-header{padding:12px 18px;background:var(--bg4);border-bottom:1px solid var(--border2);font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--accent2);display:flex;align-items:center;gap:8px;}
+  .ref-body{padding:14px 18px;}
+  .ref-table{width:100%;border-collapse:collapse;}
+  .ref-table tr:not(:last-child){border-bottom:1px solid var(--border2);}
+  .ref-table td{padding:7px 0;font-size:13px;color:var(--text2);vertical-align:middle;}
+  .ref-table td:first-child{font-weight:600;color:var(--text);width:48%;}
+  .ref-table td:last-child{font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);text-align:right;}
+  .brett-strain{padding:9px 12px;background:var(--bg4);border-radius:5px;border-left:3px solid var(--brett);margin-bottom:8px;}
+  .brett-strain-name{font-family:'Space Mono',monospace;font-size:11px;color:var(--brett2);font-weight:700;letter-spacing:1px;margin-bottom:3px;}
+  .brett-strain-desc{font-size:12px;color:var(--text3);line-height:1.5;}
+  .brett-strain-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;}
+  .strain-tag{font-family:'Space Mono',monospace;font-size:9px;padding:2px 7px;border-radius:10px;background:var(--brett3);color:var(--brett2);text-transform:uppercase;letter-spacing:1px;}
+  /* BODEGA */
+  .cellar-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px;}
+  .cellar-stat{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:16px;text-align:center;border-top:2px solid var(--blue);}
+  .cellar-stat .val{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--blue2);line-height:1;}
+  .cellar-stat .lbl{font-family:'Space Mono',monospace;font-size:9px;color:var(--text4);letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
+  .cellar-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+  .cellar-card{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .25s;}
+  .cellar-card:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.4);}
+  .cellar-card-img{background:var(--bg4);display:flex;align-items:center;justify-content:center;min-height:180px;padding:12px;position:relative;}
+  .cellar-card-img img{max-width:100%;max-height:200px;object-fit:contain;border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,.5);}
+  .cellar-card-img-placeholder{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text4);font-size:38px;}
+  .cellar-bottle-badge{position:absolute;top:8px;right:8px;background:rgba(58,106,140,.88);color:#a0d4f0;font-family:'Space Mono',monospace;font-size:9px;padding:3px 8px;border-radius:12px;letter-spacing:1px;}
+  .cellar-card-body{padding:13px;}
+  .cellar-card-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:2px;}
+  .cellar-card-ref{font-family:'Space Mono',monospace;font-size:9px;color:var(--text4);letter-spacing:2px;margin-bottom:10px;}
+  .stock-bar{height:5px;background:var(--bg5);border-radius:3px;overflow:hidden;margin-top:4px;}
+  .stock-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#2a6a9c,var(--blue2));transition:width .4s;}
+  .stock-fill.low{background:linear-gradient(90deg,var(--accent3),var(--accent));}
+  .stock-fill.empty{background:var(--red);}
+  .cellar-card-footer{padding:10px 13px;background:var(--bg4);border-top:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center;}
+  .cellar-liters{font-family:'Space Mono',monospace;font-size:11px;color:var(--blue2);font-weight:700;}
+  .tx-list{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;}
+  .tx-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg3);border-radius:5px;border-left:3px solid var(--border);}
+  .tx-item.out{border-left-color:var(--red);}
+  .tx-item.in{border-left-color:var(--brett);}
+  .tx-qty{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;min-width:32px;}
+  .tx-qty.out{color:var(--red);}.tx-qty.in{color:var(--brett2);}
+  /* CATAS BJCP */
+  .tasting-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+  .tasting-card{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .25s;}
+  .tasting-card:hover{border-color:var(--accent3);transform:translateY(-2px);}
+  .tasting-card-header{padding:13px 15px;background:var(--bg4);border-bottom:1px solid var(--border2);}
+  .tasting-card-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--text);margin-bottom:3px;}
+  .tasting-card-meta{font-family:'Space Mono',monospace;font-size:9px;color:var(--text4);letter-spacing:2px;}
+  .bjcp-score-total{font-family:'Playfair Display',serif;font-size:40px;font-weight:900;color:var(--accent2);line-height:1;}
+  .bjcp-score-max{font-size:16px;color:var(--text4);}
+  .bjcp-rank-badge{display:inline-block;font-family:'Space Mono',monospace;font-size:9px;padding:3px 10px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;margin-top:5px;}
+  .bjcp-rank-outstanding{background:rgba(232,184,75,.2);color:var(--accent2);border:1px solid rgba(232,184,75,.4);}
+  .bjcp-rank-excellent{background:rgba(138,184,84,.2);color:var(--brett2);border:1px solid rgba(138,184,84,.4);}
+  .bjcp-rank-verygood{background:rgba(74,162,128,.2);color:#4aa280;border:1px solid rgba(74,162,128,.4);}
+  .bjcp-rank-good{background:rgba(58,106,140,.2);color:var(--blue2);border:1px solid rgba(58,106,140,.4);}
+  .bjcp-rank-fair{background:rgba(200,146,42,.1);color:var(--accent3);border:1px solid rgba(200,146,42,.2);}
+  .bjcp-rank-problematic{background:rgba(196,74,42,.1);color:var(--red);border:1px solid rgba(196,74,42,.2);}
+  .score-mini-bars{display:flex;flex-direction:column;gap:4px;margin-top:8px;}
+  .score-mini-bar{display:flex;align-items:center;gap:6px;}
+  .score-mini-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--text4);width:60px;}
+  .score-mini-track{flex:1;height:4px;background:var(--bg5);border-radius:2px;overflow:hidden;}
+  .score-mini-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent3),var(--accent2));}
+  .score-mini-num{font-family:'Space Mono',monospace;font-size:9px;color:var(--accent);width:18px;text-align:right;}
+  /* BJCP SCORESHEET */
+  .bjcp-section{background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:14px;overflow:hidden;}
+  .bjcp-section-header{padding:11px 16px;background:var(--bg4);border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .bjcp-section-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--accent2);}
+  .bjcp-section-sub{font-size:11px;color:var(--text4);font-style:italic;}
+  .bjcp-section-score{display:flex;align-items:baseline;gap:3px;flex-shrink:0;}
+  .bjcp-score-input{width:50px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--accent2);font-family:'Playfair Display',serif;font-size:22px;font-weight:700;text-align:center;padding:3px 4px;outline:none;}
+  .bjcp-score-input:focus{border-color:var(--accent);}
+  .bjcp-score-max-label{font-family:'Space Mono',monospace;font-size:11px;color:var(--text4);}
+  .bjcp-section-body{padding:14px 16px;}
+  .bjcp-total-display{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:18px;text-align:center;margin-bottom:14px;}
+  .bjcp-total-number{font-family:'Playfair Display',serif;font-size:60px;font-weight:900;color:var(--accent2);line-height:1;}
+  .bjcp-total-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--text4);letter-spacing:3px;text-transform:uppercase;margin-top:5px;}
+  .bjcp-rank-display{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-top:7px;}
+  /* PHOTO */
+  input[type="file"]{display:none;}
+  .photo-upload-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;background:var(--bg4);border:1px dashed var(--border);border-radius:6px;cursor:pointer;color:var(--text3);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;transition:all .2s;width:100%;}
+  .photo-upload-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .photo-preview{width:100%;max-height:180px;object-fit:contain;border-radius:6px;border:1px solid var(--border);margin-bottom:8px;background:var(--bg4);}
+  /* MISC */
+  .rating-stars{display:flex;gap:3px;}
+  .star{font-size:20px;color:var(--bg5);cursor:pointer;transition:color .15s;}
+  .star.filled{color:var(--accent2);}
+  .divider{height:1px;background:var(--border2);margin:16px 0;}
+  .empty-state{text-align:center;padding:50px 20px;color:var(--text4);}
+  .empty-state-icon{font-size:52px;margin-bottom:12px;opacity:.4;}
+  .empty-state-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:8px;color:var(--text3);}
+  .empty-state-sub{font-size:14px;line-height:1.6;max-width:300px;margin:0 auto 18px;}
+  .data-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:14px;}
+  .data-card-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--text);margin-bottom:8px;}
+  .data-card-desc{font-size:14px;color:var(--text3);margin-bottom:14px;line-height:1.6;}
+  .highlight-brett{color:var(--brett2);font-weight:700;}
+  .version-badge{font-family:'Space Mono',monospace;font-size:9px;color:var(--text4);position:fixed;bottom:10px;left:10px;letter-spacing:1px;z-index:50;}
+  ::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:var(--bg2);}::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:3px;}::-webkit-scrollbar-thumb:hover{background:var(--accent3);}
+  /* RESPONSIVE */
+  @media(max-width:900px){
+    .hamburger{display:block;}
+    .sidebar{transform:translateX(-100%);}
+    .sidebar.open{transform:translateX(0);}
+    .sidebar-overlay.open{display:block;}
+    .main{margin-left:0;}
+    .topbar{padding:0 14px;}
+    .page{padding:14px;}
+    .stats-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+    .stat-value{font-size:24px;}
+    .beer-grid,.cellar-grid,.tasting-grid,.calc-grid,.ref-grid{grid-template-columns:1fr;}
+    .form-grid{grid-template-columns:1fr;}
+    .detail-header{grid-template-columns:1fr;}
+    .detail-name{font-size:24px;}
+    .modal{border-radius:8px;margin:0;}
+    .modal-header{flex-wrap:wrap;}
+    .modal-header-actions{gap:5px;}
+    .modal-header-actions .btn{font-size:9px;padding:4px 8px;}
+    .ref-grid{grid-template-columns:1fr;}
+    .modal-overlay{padding:10px 6px;align-items:flex-start;}
+    .modal-body{-webkit-overflow-scrolling:touch;overflow-y:scroll!important;}
+    .bjcp-section-body .form-grid{grid-template-columns:1fr;}
+    .detail-stats-row{gap:6px;}
+    .detail-stat{min-width:52px;padding:7px 10px;}
+    .detail-stat .val{font-size:18px;}
+    .ing-table th,.ing-table td{font-size:11px;padding:3px 2px;}
+    .ing-table td input,.ing-table td select{font-size:11px;padding:4px 5px;}
+    .cellar-summary{grid-template-columns:repeat(3,1fr);gap:8px;}
+    .cellar-stat .val{font-size:22px;}
+    .bjcp-section-header{flex-wrap:wrap;gap:6px;}
+  }
+  @media(min-width:1200px){
+    .beer-grid{grid-template-columns:repeat(4,1fr);}
+    .cellar-grid{grid-template-columns:repeat(4,1fr);}
+  }
+</style>
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <span class="logo-icon">🦠🦠🦠</span>
+    <div class="logo-octo">Brett</div>
+    <div class="logo-main">Wild laboratory</div>
+    <div class="logo-sub">Brett Lab v3.0</div>
+  </div>
+  <nav class="nav-section">
+    <div class="nav-label">Principal</div>
+    <div class="nav-item active" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span> Dashboard</div>
+    <div class="nav-item" onclick="showPage('catalog',this)"><span class="nav-icon">🍺</span> Catálogo<span class="nav-badge" id="nav-badge-catalog">0</span></div>
+  </nav>
+  <nav class="nav-section">
+    <div class="nav-label">Bodega &amp; Catas</div>
+    <div class="nav-item" onclick="showPage('cellar',this)"><span class="nav-icon">🍾</span> Bodega<span class="nav-badge" id="nav-badge-cellar">0</span></div>
+    <div class="nav-item" onclick="showPage('catas',this)"><span class="nav-icon">📋</span> Catas BJCP<span class="nav-badge" id="nav-badge-catas">0</span></div>
+  </nav>
+  <nav class="nav-section">
+    <div class="nav-label">Herramientas</div>
+    <div class="nav-item" onclick="showPage('calculators',this)"><span class="nav-icon">⚗️</span> Calculadoras</div>
+    <div class="nav-item" onclick="showPage('reference',this)"><span class="nav-icon">📚</span> Enciclopedia Brett</div>
+  </nav>
+  <nav class="nav-section">
+    <div class="nav-label">Datos</div>
+    <div class="nav-item" onclick="showPage('data',this)"><span class="nav-icon">💾</span> Exportar / Importar</div>
+  </nav>
+  <div style="padding:14px 24px;margin-top:auto;border-top:1px solid var(--border2);">
+    <div style="font-size:11px;color:var(--text4);line-height:1.6;font-style:italic;"><span class="highlight-brett">By Octopalomo Brewing</span><br>BCN-HBS</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-primary" onclick="openNewBeerModal()">+ Nueva Receta</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="page-dashboard" class="page active">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Total Recetas</div><div class="stat-value" id="stat-total">0</div><div class="stat-sub">elaboraciones registradas</div><div class="stat-icon">🍺</div></div>
+      <div class="stat-card brett"><div class="stat-label">Con Brett</div><div class="stat-value" id="stat-brett">0</div><div class="stat-sub">recetas con Brettanomyces</div><div class="stat-icon">🦠</div></div>
+      <div class="stat-card cellar"><div class="stat-label">Botellas Bodega</div><div class="stat-value" id="stat-cellar-bottles">0</div><div class="stat-sub">stock total disponible</div><div class="stat-icon">🍾</div></div>
+      <div class="stat-card brett"><div class="stat-label">Catas BJCP</div><div class="stat-value" id="stat-tastings">0</div><div class="stat-sub">notas de cata registradas</div><div class="stat-icon">📋</div></div>
+    </div>
+    <div class="section-header">
+      <div><div class="section-title">Últimas Elaboraciones</div><div class="section-sub">Recetas recientes del laboratorio</div></div>
+      <button class="btn btn-ghost btn-sm" onclick="showPage('catalog',null)">Ver todas →</button>
+    </div>
+    <div class="beer-grid" id="dashboard-recent-grid">
+      <div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🍶</div><div class="empty-state-title">Sin elaboraciones aún</div><div class="empty-state-sub">Crea tu primera receta salvaje</div><button class="btn btn-primary" onclick="openNewBeerModal()">+ Crear primera receta</button></div>
+    </div>
+    <div class="section-header" style="margin-top:8px;">
+      <div><div class="section-title">Estado del Laboratorio</div><div class="section-sub">Fermentaciones y añejamientos activos</div></div>
+    </div>
+    <div id="dashboard-lab">
+      <div style="padding:16px;background:var(--bg3);border-radius:8px;border:1px solid var(--border2);text-align:center;color:var(--text4);font-size:13px;font-style:italic;">No hay fermentaciones activas.</div>
+    </div>
+  </div>
+
+  <!-- CATALOG -->
+  <div id="page-catalog" class="page">
+    <div style="display:flex;gap:10px;margin-bottom:18px;align-items:center;flex-wrap:wrap;">
+      <input type="text" class="form-input" style="flex:1;min-width:160px;" placeholder="Buscar por nombre, estilo..." id="search-input" oninput="renderCatalog()">
+      <select class="form-select" style="width:170px;" id="filter-style" onchange="renderCatalog()">
+        <option value="">Todos los estilos</option>
+        <option>Brett Saison</option><option>Farmhouse Ale</option><option>Brett IPA</option>
+        <option>Gueuze / Lambic</option><option>Oud Bruin</option><option>Flanders Red</option>
+        <option>Wild Ale</option><option>Mixed Ferm.</option><option>Solera</option><option>Otro</option>
+      </select>
+      <select class="form-select" style="width:150px;" id="filter-status" onchange="renderCatalog()">
+        <option value="">Todos los estados</option>
+        <option value="fermenting">Fermentando</option><option value="aging">Añejando</option>
+        <option value="ready">Listo</option><option value="concept">Concepto</option>
+      </select>
+    </div>
+    <div class="beer-grid" id="catalog-grid"></div>
+  </div>
+
+  <!-- BODEGA -->
+  <div id="page-cellar" class="page">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+      <div><div class="section-title">🍾 Bodega</div><div class="section-sub">Inventario de botellas por referencia</div></div>
+      <button class="btn btn-cellar" onclick="openCellarModal()">+ Añadir Referencia</button>
+    </div>
+    <div class="cellar-summary">
+      <div class="cellar-stat"><div class="val" id="cs-refs">0</div><div class="lbl">Referencias</div></div>
+      <div class="cellar-stat"><div class="val" id="cs-bottles">0</div><div class="lbl">Botellas</div></div>
+      <div class="cellar-stat"><div class="val" id="cs-liters">0L</div><div class="lbl">Litros totales</div></div>
+    </div>
+    <div class="cellar-grid" id="cellar-grid">
+      <div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🍾</div><div class="empty-state-title">Bodega vacía</div><div class="empty-state-sub">Añade tus primeras referencias de botella</div><button class="btn btn-cellar" onclick="openCellarModal()">+ Añadir referencia</button></div>
+    </div>
+  </div>
+
+  <!-- CATAS BJCP -->
+  <div id="page-catas" class="page">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+      <div><div class="section-title">📋 Catas BJCP</div><div class="section-sub">Hojas de cata estilo BJCP — hasta 50 puntos</div></div>
+      <button class="btn btn-primary" onclick="openCataModal()">+ Nueva Cata</button>
+    </div>
+    <div class="tasting-grid" id="catas-grid">
+      <div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">📋</div><div class="empty-state-title">Sin catas registradas</div><button class="btn btn-primary" onclick="openCataModal()">+ Nueva Cata</button></div>
+    </div>
+  </div>
+
+  <!-- CALCULADORAS -->
+  <div id="page-calculators" class="page">
+    <div style="margin-bottom:20px;"><div class="section-title">Calculadoras del Homebrewer</div><div class="section-sub">Herramientas especializadas en fermentación salvaje</div></div>
+    <div class="calc-grid">
+      <div class="calc-card"><div class="calc-header"><div class="calc-title">🍷 ABV</div><div class="calc-desc">Alcohol por volumen — estándar, Noonan, Brett</div></div>
+        <div class="calc-body">
+          <div class="form-grid"><div class="form-group"><label class="form-label">OG</label><input type="number" class="form-input" id="calc-og" placeholder="1.060" step="0.001" oninput="calcABV()"></div><div class="form-group"><label class="form-label">FG</label><input type="number" class="form-input" id="calc-fg" placeholder="1.008" step="0.001" oninput="calcABV()"></div></div>
+          <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Método</label><select class="form-select" id="calc-method" onchange="calcABV()"><option value="standard">Estándar</option><option value="advanced">Noonan</option><option value="brett">Brett (+5%)</option></select></div>
+          <div class="calc-result" id="abv-result"><div class="calc-result-value">—</div><div class="calc-result-label">% ABV</div></div>
+          <div style="margin-top:10px;font-size:12px;color:var(--text4);font-style:italic;" id="abv-detail"></div>
+        </div>
+      </div>
+      <div class="calc-card"><div class="calc-header"><div class="calc-title">🦠 Atenuación Brett</div><div class="calc-desc">Atenuación aparente y real</div></div>
+        <div class="calc-body">
+          <div class="form-grid"><div class="form-group"><label class="form-label">OG</label><input type="number" class="form-input" id="att-og" placeholder="1.060" step="0.001" oninput="calcAttenuation()"></div><div class="form-group"><label class="form-label">FG</label><input type="number" class="form-input" id="att-fg" placeholder="1.005" step="0.001" oninput="calcAttenuation()"></div></div>
+          <div class="calc-result" style="padding:12px;margin-bottom:10px;"><div style="display:flex;justify-content:space-around;"><div style="text-align:center;"><div style="font-family:'Space Mono',monospace;font-size:24px;font-weight:700;color:var(--brett2);" id="att-apparent">—</div><div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--text4);letter-spacing:2px;text-transform:uppercase;margin-top:3px;">Aparente</div></div><div style="text-align:center;"><div style="font-family:'Space Mono',monospace;font-size:24px;font-weight:700;color:var(--accent);" id="att-real">—</div><div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--text4);letter-spacing:2px;text-transform:uppercase;margin-top:3px;">Real</div></div></div></div>
+          <div class="attenuation-bar"><div class="attenuation-fill" id="att-bar" style="width:0%">0%</div></div>
+          <div style="font-size:12px;color:var(--text4);font-style:italic;margin-top:8px;" id="att-interpret"></div>
+        </div>
+      </div>
+      <div class="calc-card"><div class="calc-header"><div class="calc-title">🌿 IBU</div><div class="calc-desc">Amargor — método Tinseth</div></div>
+        <div class="calc-body">
+          <div class="form-grid"><div class="form-group"><label class="form-label">Alpha (%)</label><input type="number" class="form-input" id="ibu-alpha" placeholder="5.5" step="0.1" oninput="calcIBU()"></div><div class="form-group"><label class="form-label">Cantidad (g)</label><input type="number" class="form-input" id="ibu-amount" placeholder="30" oninput="calcIBU()"></div><div class="form-group"><label class="form-label">Tiempo (min)</label><input type="number" class="form-input" id="ibu-time" placeholder="60" oninput="calcIBU()"></div><div class="form-group"><label class="form-label">Volumen (L)</label><input type="number" class="form-input" id="ibu-volume" placeholder="20" oninput="calcIBU()"></div></div>
+          <div class="form-group" style="margin-bottom:12px;"><label class="form-label">OG del mosto</label><input type="number" class="form-input" id="ibu-og" placeholder="1.060" step="0.001" oninput="calcIBU()"></div>
+          <div class="calc-result"><div class="calc-result-value" id="ibu-result">—</div><div class="calc-result-label">IBU</div></div>
+          <div style="margin-top:10px;font-size:12px;color:var(--text4);font-style:italic;" id="ibu-style"></div>
+        </div>
+      </div>
+      <div class="calc-card"><div class="calc-header"><div class="calc-title">🎨 Color SRM / EBC</div><div class="calc-desc">Método Morey</div></div>
+        <div class="calc-body">
+          <div style="display:grid;grid-template-columns:1fr 65px 75px;gap:8px;margin-bottom:8px;align-items:end;"><div><label class="form-label" style="font-size:9px;">Malta</label><input type="text" class="form-input" placeholder="Pilsen..." id="srm-malt-1" oninput="calcSRM()"></div><div><label class="form-label" style="font-size:9px;">Kg</label><input type="number" class="form-input" placeholder="3.5" id="srm-kg-1" step="0.1" oninput="calcSRM()"></div><div><label class="form-label" style="font-size:9px;">Lovibond</label><input type="number" class="form-input" placeholder="2" id="srm-lov-1" step="0.5" oninput="calcSRM()"></div></div>
+          <div style="display:grid;grid-template-columns:1fr 65px 75px;gap:8px;margin-bottom:8px;"><input type="text" class="form-input" placeholder="Malta 2..." id="srm-malt-2" oninput="calcSRM()"><input type="number" class="form-input" placeholder="0.5" id="srm-kg-2" step="0.1" oninput="calcSRM()"><input type="number" class="form-input" placeholder="10" id="srm-lov-2" step="0.5" oninput="calcSRM()"></div>
+          <div style="display:grid;grid-template-columns:1fr 65px 75px;gap:8px;margin-bottom:8px;"><input type="text" class="form-input" placeholder="Malta 3..." id="srm-malt-3" oninput="calcSRM()"><input type="number" class="form-input" placeholder="0.2" id="srm-kg-3" step="0.1" oninput="calcSRM()"><input type="number" class="form-input" placeholder="120" id="srm-lov-3" step="0.5" oninput="calcSRM()"></div>
+          <div class="form-group" style="margin-bottom:10px;"><label class="form-label">Volumen (L)</label><input type="number" class="form-input" id="srm-vol" placeholder="20" oninput="calcSRM()"></div>
+          <div class="srm-display" id="srm-display" style="background:var(--bg4);color:var(--text4);">— Ingresa datos —</div>
+          <div style="margin-top:6px;font-size:12px;color:var(--text4);font-style:italic;text-align:center;" id="srm-label"></div>
+        </div>
+      </div>
+      <div class="calc-card"><div class="calc-header"><div class="calc-title">🫧 Carbonatación</div><div class="calc-desc">Priming sugar — carbonatación natural</div></div>
+        <div class="calc-body">
+          <div class="form-grid"><div class="form-group"><label class="form-label">Vols CO₂</label><input type="number" class="form-input" id="carb-vols" placeholder="2.5" step="0.1" oninput="calcCarb()"><span class="form-hint">Brett Saison: 3.0–3.8</span></div><div class="form-group"><label class="form-label">Temp (°C)</label><input type="number" class="form-input" id="carb-temp" placeholder="20" oninput="calcCarb()"></div><div class="form-group"><label class="form-label">Volumen (L)</label><input type="number" class="form-input" id="carb-vol" placeholder="19" oninput="calcCarb()"></div><div class="form-group"><label class="form-label">Tipo azúcar</label><select class="form-select" id="carb-sugar" onchange="calcCarb()"><option value="1">Sacarosa</option><option value="1.05">Dextrosa</option><option value="0.8">Miel</option><option value="0.91">Coco</option><option value="0.88">DME</option></select></div></div>
+          <div class="calc-result"><div class="calc-result-value" id="carb-result">—</div><div class="calc-result-label">Gramos azúcar</div></div>
+          <div style="margin-top:10px;font-size:12px;color:var(--text4);font-style:italic;" id="carb-warn"></div>
+        </div>
+      </div>
+      <div class="calc-card"><div class="calc-header"><div class="calc-title">💧 Acidez / Perfil</div><div class="calc-desc">Estimación de acidez en fermentaciones mixtas</div></div>
+        <div class="calc-body">
+          <div class="form-group" style="margin-bottom:12px;"><label class="form-label">pH objetivo</label><input type="number" class="form-input" id="ph-target" placeholder="4.2" step="0.1" oninput="calcPH()"></div>
+          <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Perfil</label><select class="form-select" id="ph-profile" onchange="calcPH()"><option value="brett">Brett limpio</option><option value="lacto">Lactobacillus</option><option value="acetobacter">Acetobacter</option><option value="complex">Complejo (lambic)</option></select></div>
+          <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Tiempo</label><select class="form-select" id="ph-time" onchange="calcPH()"><option value="short">Corto 3–6 meses</option><option value="medium">Medio 6–18 meses</option><option value="long">Largo 18–36 meses</option><option value="solera">Solera</option></select></div>
+          <div class="calc-result" id="ph-result"><div style="font-size:13px;color:var(--text3);">Ingresa los parámetros.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENCICLOPEDIA -->
+  <div id="page-reference" class="page">
+    <div style="margin-bottom:20px;"><div class="section-title">Enciclopedia Brett</div><div class="section-sub">Referencia técnica completa para cervecería salvaje</div></div>
+    <div class="ref-grid">
+      <div class="ref-card" style="grid-column:1/-1;"><div class="ref-header">🦠 Cepas de Brettanomyces / Dekkera</div>
+        <div class="ref-body"><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+          <div class="brett-strain"><div class="brett-strain-name">B. bruxellensis</div><div class="brett-strain-desc">La más común en cervezas belgas. Produce 4-EP y 4-EG (cuero, establo, ahumado). Alta tolerancia alcohólica, fermentación lenta y muy persistente. Puede sobrevivir años en barrica. Temperatura óptima 20–24°C. Umbral de percepción muy bajo.</div><div class="brett-strain-tags"><span class="strain-tag">Cuero</span><span class="strain-tag">Establo</span><span class="strain-tag">Ahumado</span><span class="strain-tag">Alta tolerancia</span></div></div>
+          <div class="brett-strain"><div class="brett-strain-name">B. anomalus</div><div class="brett-strain-desc">Perfil muy frutal: plátano, clavo, flores. Menos fenólico que bruxellensis. Ideal para saisons y ales ligeras. Buena actividad celulolítica. Temperatura óptima 22–26°C. Atenuación 80–90%. Sin notas animales dominantes.</div><div class="brett-strain-tags"><span class="strain-tag">Plátano</span><span class="strain-tag">Clavo</span><span class="strain-tag">Floral</span><span class="strain-tag">Ésteres</span></div></div>
+          <div class="brett-strain"><div class="brett-strain-name">B. claussenii</div><div class="brett-strain-desc">Perfil tropical: piña, mango, maracuyá. Baja producción de 4-EP. Popular en craft brewing moderno. Poca acidez acética. Ideal para brett limpio y afrutado. Muy versátil y buena con lúpulo tropical.</div><div class="brett-strain-tags"><span class="strain-tag">Tropical</span><span class="strain-tag">Piña</span><span class="strain-tag">Mango</span><span class="strain-tag">Bajo fenol</span></div></div>
+          <div class="brett-strain"><div class="brett-strain-name">B. lambicus</div><div class="brett-strain-desc">Clave en lambic tradicional. Notas intensas a cuero viejo, tierra húmeda, queso. Alta producción de ácido acético con O₂. Fermentación muy lenta: 6–36 meses. Soporta pH ≤ 3.2. Esencial en gueuze auténtica.</div><div class="brett-strain-tags"><span class="strain-tag">Lambic</span><span class="strain-tag">Cuero</span><span class="strain-tag">Tierra</span><span class="strain-tag">Lento</span></div></div>
+          <div class="brett-strain"><div class="brett-strain-name">B. naardenensis</div><div class="brett-strain-desc">Poco conocida en cerveza. Notas florales y terrosas. Baja producción de ácidos. Utilizada en experimentación de vanguardia. Atenuación media. Emergente en craft. Interesante en mezcla con otras cepas brett.</div><div class="brett-strain-tags"><span class="strain-tag">Floral</span><span class="strain-tag">Terroso</span><span class="strain-tag">Experimental</span></div></div>
+          <div class="brett-strain"><div class="brett-strain-name">B. custersianus</div><div class="brett-strain-desc">Raro en cerveza. Produce poco ácido acético incluso con oxígeno. Notas suaves y terrosas. Interesante para fermentaciones largas sin acidez excesiva. Baja producción de THP. Prometedor para experimentación.</div><div class="brett-strain-tags"><span class="strain-tag">Suave</span><span class="strain-tag">Terroso</span><span class="strain-tag">Bajo ácido</span></div></div>
+        </div></div>
+      </div>
+      <div class="ref-card"><div class="ref-header">🧪 Compuestos de Sabor Brett</div>
+        <div class="ref-body"><table class="ref-table">
+          <tr><td>4-Etilfenol (4-EP)</td><td>Cuero, establo</td><td>425 µg/L</td></tr>
+          <tr><td>4-Etilguaiacol (4-EG)</td><td>Ahumado, clavo</td><td>600 µg/L</td></tr>
+          <tr><td>Ácido isovalérico</td><td>Queso, calcetines</td><td>33 mg/L</td></tr>
+          <tr><td>Acetato de isoamilo</td><td>Plátano, frutado</td><td>1.2 mg/L</td></tr>
+          <tr><td>Tetrahidropiridinas</td><td>Ratón, paja húmeda</td><td>1.6 µg/L</td></tr>
+          <tr><td>Acetaldehído</td><td>Manzana verde</td><td>10 mg/L</td></tr>
+          <tr><td>Ácido acético</td><td>Vinagre</td><td>0.2 g/L</td></tr>
+          <tr><td>Diacetil</td><td>Mantequilla, toffee</td><td>0.1 mg/L</td></tr>
+          <tr><td>2-Feniletanol</td><td>Rosa, miel, floral</td><td>25 mg/L</td></tr>
+          <tr><td>Etil acetato</td><td>Disolvente, barniz</td><td>30 mg/L</td></tr>
+        </table>
+        <div style="margin-top:10px;font-size:11px;color:var(--text4);font-style:italic;">* Umbral de percepción aproximado</div></div>
+      </div>
+      <div class="ref-card"><div class="ref-header">🌡️ Temperaturas y Tiempos</div>
+        <div class="ref-body"><table class="ref-table">
+          <tr><td>Fermentación primaria Saccharomyces</td><td>18–22°C</td></tr>
+          <tr><td>Brett inoculación secundaria</td><td>20–24°C</td></tr>
+          <tr><td>Brett co-fermentación</td><td>22–26°C</td></tr>
+          <tr><td>Añejamiento en barrica</td><td>14–18°C</td></tr>
+          <tr><td>Maduración en botella</td><td>16–20°C</td></tr>
+          <tr><td>Temperatura de servicio</td><td>8–12°C</td></tr>
+          <tr><td>Pasteurización flash</td><td>60–65°C / 30s</td></tr>
+          <tr><td>Activación Lacto (kettle sour)</td><td>38–45°C / 12–72h</td></tr>
+          <tr><td>Maceración brett multipaso</td><td>40→65→72°C</td></tr>
+        </table></div>
+      </div>
+      <div class="ref-card"><div class="ref-header">🗺️ Estilos Salvajes BJCP</div>
+        <div class="ref-body"><table class="ref-table">
+          <tr><td>28A. Brett Beer</td><td>OG libre / ABV 4–10%</td></tr>
+          <tr><td>28B. Mixed-Ferm. Sour</td><td>OG libre / Acidez variable</td></tr>
+          <tr><td>23D. Lambic</td><td>OG 1.048–1.056 / ABV 5–8%</td></tr>
+          <tr><td>23E. Gueuze</td><td>Blend lambics / ABV 5–8%</td></tr>
+          <tr><td>23B. Flanders Red</td><td>OG 1.055–1.068 / ABV 4.6–6.5%</td></tr>
+          <tr><td>23C. Oud Bruin</td><td>OG 1.060–1.074 / ABV 4–8%</td></tr>
+          <tr><td>25B. Saison (Brett)</td><td>OG 1.048–1.065 / ABV 5–8%</td></tr>
+          <tr><td>23A. Berliner Weisse</td><td>OG 1.028–1.032 / ABV 2.8–3.8%</td></tr>
+          <tr><td>Gose</td><td>OG 1.036–1.056 / ABV 4–5%</td></tr>
+          <tr><td>Solera</td><td>Variable / añejamiento continuo</td></tr>
+        </table></div>
+      </div>
+      <div class="ref-card"><div class="ref-header">🧫 Bacterias Cofermentadoras</div>
+        <div class="ref-body">
+          <div class="brett-strain" style="border-left-color:var(--accent);"><div class="brett-strain-name" style="color:var(--accent2);">Lactobacillus</div><div class="brett-strain-desc">Produce ácido láctico. pH óptimo 4.0–4.5. Temp: 35–45°C. No tolera lúpulo (&lt;5 IBU). Acidifica en 12–72h. Usado en Berliner, Gose, kettle sour. Especies: plantarum, brevis, delbrueckii, helveticus.</div></div>
+          <div class="brett-strain" style="border-left-color:var(--accent);"><div class="brett-strain-name" style="color:var(--accent2);">Pediococcus damnosus</div><div class="brett-strain-desc">Produce ácido láctico + diacetil (mantequilla). El brett reduce el diacetil en 2–6 semanas. Proceso largo: 2–18 meses. Clave en lambic. Ropiness temporal es normal. Soporta hasta 8% ABV y pH muy bajo.</div></div>
+          <div class="brett-strain" style="border-left-color:var(--red);"><div class="brett-strain-name" style="color:#e07050;">Acetobacter / Gluconobacter</div><div class="brett-strain-desc">Produce ácido acético (vinagre). Requiere oxígeno. Deseable en pequeñas cantidades en Flanders Red. Indeseado en brett limpio. Controlar acceso al O₂ estrictamente.</div></div>
+        </div>
+      </div>
+      <div class="ref-card"><div class="ref-header">🪵 Madera y Barricas</div>
+        <div class="ref-body"><table class="ref-table">
+          <tr><td>Roble francés (Limousin)</td><td>Vainilla fina, coco, especias</td></tr>
+          <tr><td>Roble americano</td><td>Vainilla intensa, coco, dulce</td></tr>
+          <tr><td>Roble húngaro</td><td>Especiado, floral, menos taninos</td></tr>
+          <tr><td>Barrica ex-bourbon</td><td>Vainilla, caramelo, madera tostada</td></tr>
+          <tr><td>Barrica ex-vino tinto</td><td>Taninos, frutos rojos, terroso</td></tr>
+          <tr><td>Barrica ex-jerez Oloroso</td><td>Nueces, pasas, oxidativo</td></tr>
+          <tr><td>Barrica ex-calvados</td><td>Manzana, pera, especiado</td></tr>
+          <tr><td>Chips roble (150g/20L)</td><td>Contacto: 2–4 semanas 15°C</td></tr>
+        </table></div>
+      </div>
+      <div class="ref-card"><div class="ref-header">💧 Química del Agua</div>
+        <div class="ref-body"><table class="ref-table">
+          <tr><td>Calcio (Ca²⁺)</td><td>50–100 mg/L</td></tr>
+          <tr><td>Magnesio (Mg²⁺)</td><td>&lt;30 mg/L</td></tr>
+          <tr><td>Sulfato (SO₄²⁻)</td><td>50–150 mg/L (saison: seco)</td></tr>
+          <tr><td>Cloruro (Cl⁻)</td><td>50–150 mg/L (cuerpo)</td></tr>
+          <tr><td>Bicarbonato (HCO₃⁻)</td><td>&lt;50 mg/L</td></tr>
+          <tr><td>pH mosto objetivo</td><td>5.2–5.4</td></tr>
+          <tr><td>Perfil Bruselas</td><td>Muy blando, levemente calcáreo</td></tr>
+        </table>
+        <div style="margin-top:10px;font-size:12px;color:var(--text4);">Sulfato alto favorece sequedad. Baja alcalinidad ayuda a manejar pH final en sours.</div></div>
+      </div>
+      <div class="ref-card"><div class="ref-header">🔧 Troubleshooting Salvaje</div>
+        <div class="ref-body">
+          <div class="brett-strain" style="border-left-color:var(--red);"><div class="brett-strain-name" style="color:#e07050;">Mouse / Ratón (THP)</div><div class="brett-strain-desc">Tetrahidropiridinas. Umbral muy bajo (1.6 µg/L). Reduce con pH bajo (&lt;3.8). Se percibe más caliente. Se enjuaga con agua. No siempre es un defecto irremediable si es leve.</div></div>
+          <div class="brett-strain" style="border-left-color:var(--red);"><div class="brett-strain-name" style="color:#e07050;">Exceso de vinagre</div><div class="brett-strain-desc">Controlar acceso al O₂. Airlock siempre activo. Topping up de barricas. Temperatura &lt;18°C reduce Acetobacter.</div></div>
+          <div class="brett-strain" style="border-left-color:var(--accent);"><div class="brett-strain-name" style="color:var(--accent2);">Fermentación detenida</div><div class="brett-strain-desc">Brett muy lento en cervezas atenuadas. Añadir nutrientes. Temperatura 24–26°C. Solera: mezclar con lote nuevo. 3–24 meses es completamente normal.</div></div>
+          <div class="brett-strain" style="border-left-color:var(--brett);"><div class="brett-strain-name" style="color:var(--brett2);">Sobrecarbonatación en botella</div><div class="brett-strain-desc">Brett consume dextrinas en botella. Pasteurizar a 60°C/15min. Usar botellas champán (6+ bar). Verificar FG estable semanas antes de embotellar.</div></div>
+        </div>
+      </div>
+      <div class="ref-card"><div class="ref-header">🎭 Vocabulario Sensorial BJCP</div>
+        <div class="ref-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div><div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--brett2);letter-spacing:2px;margin-bottom:6px;">AROMAS BRETT</div><div style="font-size:12px;color:var(--text3);line-height:2;">Cuero seco · Establo húmedo · Tierra mojada · Champiñón · Cera de abeja · Piña madura · Mango · Uva espina · Rosas · Heno · Vinagre de manzana · Granja · Ceniza fría</div></div>
+            <div><div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--accent2);letter-spacing:2px;margin-bottom:6px;">TÉRMINOS TÉCNICOS</div><div style="font-size:12px;color:var(--text3);line-height:2;">Fenólico · Estérico · Terpénico · Terroso · Acidez láctica · Acidez acética · Oxidativo · Tánico · Astringente · Seco · Retrogusto · Brett dominante · Brett de fondo</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="ref-card"><div class="ref-header">🍻 Blending y Técnica Solera</div>
+        <div class="ref-body">
+          <div style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:12px;"><strong style="color:var(--accent2);">Solera tradicional:</strong> Nunca vaciar completamente el barril. Extraer 30–50% y rellenar con mosto nuevo. Brett del sedimento inocula automáticamente. Usado en Rodenbach, Cantillon, 3 Fonteinen.</div>
+          <table class="ref-table">
+            <tr><td>Acidez baja + acidez alta</td><td>Blending equilibrado</td></tr>
+            <tr><td>Brett joven + Brett envejecido</td><td>Complejidad + frescura</td></tr>
+            <tr><td>% mezcla típico</td><td>10–40% barrica antigua</td></tr>
+            <tr><td>Reposo post-blending</td><td>1–4 semanas mínimo</td></tr>
+            <tr><td>Embotellado post-blend</td><td>Añadir azúcar priming</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="ref-card"><div class="ref-header">⭐ Sistema BJCP — Puntuación</div>
+        <div class="ref-body">
+          <table class="ref-table">
+            <tr><td style="color:var(--accent2);">47–50 puntos</td><td style="color:var(--accent2);">Outstanding — Excepcional</td></tr>
+            <tr><td style="color:var(--brett2);">40–46 puntos</td><td style="color:var(--brett2);">Excellent — Excelente</td></tr>
+            <tr><td style="color:#4aa280;">30–39 puntos</td><td style="color:#4aa280;">Very Good — Muy Buena</td></tr>
+            <tr><td style="color:var(--blue2);">21–29 puntos</td><td style="color:var(--blue2);">Good — Buena</td></tr>
+            <tr><td style="color:var(--accent3);">14–20 puntos</td><td style="color:var(--accent3);">Fair — Aceptable</td></tr>
+            <tr><td style="color:var(--red);">0–13 puntos</td><td style="color:var(--red);">Problematic — Con problemas</td></tr>
+          </table>
+          <div style="margin-top:12px;font-size:13px;color:var(--text2);line-height:1.8;">Distribución: <strong>Aroma /12 · Apariencia /3 · Sabor /20 · Boca /5 · General /10</strong> = Total /50</div>
+        </div>
+      </div>
+      <div class="ref-card"><div class="ref-header">📅 Historia del Lambic y Cerveza Salvaje</div>
+        <div class="ref-body"><table class="ref-table">
+          <tr><td>Primeras referencias lambic</td><td>Siglo XV, Pajottenland, Bélgica</td></tr>
+          <tr><td>Cantillon fundada</td><td>1900, Bruselas</td></tr>
+          <tr><td>3 Fonteinen fundada</td><td>1887, Beersel</td></tr>
+          <tr><td>Temporada elaboración</td><td>Octubre–Abril (aire frío)</td></tr>
+          <tr><td>Coolship (koelschip)</td><td>Enfriamiento nocturno, inoculación espontánea</td></tr>
+          <tr><td>Lambic joven (uitzet)</td><td>6–12 meses</td></tr>
+          <tr><td>Lambic viejo (vieux)</td><td>18–36 meses</td></tr>
+          <tr><td>Gueuze = blend</td><td>Lambics de distintas añadas</td></tr>
+          <tr><td>Kriek</td><td>Gueuze + cerezas Schaerbeek</td></tr>
+          <tr><td>Faro</td><td>Lambic + azúcar cande</td></tr>
+        </table></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATA -->
+  <div id="page-data" class="page">
+    <div style="margin-bottom:20px;"><div class="section-title">Gestión de Datos</div><div class="section-sub">Exporta e importa tu laboratorio Brett</div></div>
+    <div style="max-width:600px;">
+      <div class="data-card"><div class="data-card-title">💾 Exportar datos</div><div class="data-card-desc">Descarga todos tus datos en JSON. Incluye recetas, bodega, catas e imágenes.</div><div style="display:flex;gap:12px;align-items:center;"><button class="btn btn-primary" onclick="exportData()">⬇ Exportar JSON</button><span style="font-size:12px;color:var(--text4);" id="export-info">—</span></div></div>
+      <div class="data-card"><div class="data-card-title">📂 Importar datos</div><div class="data-card-desc"><strong style="color:var(--red);">Atención:</strong> los datos actuales serán reemplazados. Exporta primero.</div><div style="display:flex;gap:12px;align-items:center;"><button class="btn btn-ghost" onclick="document.getElementById('import-file').click()">📂 Seleccionar JSON</button><input type="file" id="import-file" accept=".json" onchange="importData(event)"><span style="font-size:12px;color:var(--text4);" id="import-status"></span></div></div>
+      <div class="data-card"><div class="data-card-title">🗑️ Limpiar datos</div><div class="data-card-desc">Elimina todos los datos. No se puede deshacer.</div><button class="btn btn-danger" onclick="clearData()">🗑 Eliminar todos los datos</button></div>
+      <div class="data-card" style="border-color:var(--brett3);"><div class="data-card-title" style="color:var(--brett2);">ℹ️ Almacenamiento</div><div id="storage-info" style="font-size:13px;color:var(--text3);line-height:1.8;">Cargando...</div></div>
+    </div>
+  </div>
+</main>
+
+<!-- ===== MODAL: NUEVA/EDITAR RECETA ===== -->
+<div class="modal-overlay" id="beer-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title-text">Nueva Receta Brett</div>
+      <button class="modal-close" onclick="closeBeerModal()">×</button>
+    </div>
+    <div class="modal-body modal-body-scroll">
+      <!-- FOTO ETIQUETA -->
+      <div class="form-group" style="margin-bottom:18px;">
+        <label class="form-label">📷 Foto de Etiqueta</label>
+        <div id="label-preview-container" style="display:none;margin-bottom:8px;text-align:center;">
+          <img id="label-preview" class="photo-preview" src="">
+          <button class="btn btn-danger btn-sm" style="margin-top:4px;" onclick="removePhoto('label')">Eliminar foto</button>
+        </div>
+        <label class="photo-upload-btn" for="label-photo-input">📷 Subir foto / etiqueta</label>
+        <input type="file" id="label-photo-input" accept="image/*" onchange="handlePhotoUpload(event,'label')">
+      </div>
+      <div class="form-grid">
+        <div class="form-group form-full"><label class="form-label">Nombre de la cerveza *</label><input type="text" class="form-input" id="beer-name" placeholder="Ej: La Bestia Peluda #3"></div>
+        <div class="form-group"><label class="form-label">Estilo</label><select class="form-select" id="beer-style"><option>Brett Saison</option><option>Farmhouse Ale</option><option>Brett IPA</option><option>Gueuze / Lambic</option><option>Oud Bruin</option><option>Flanders Red</option><option>Wild Ale</option><option>Mixed Ferm.</option><option>Solera</option><option>Otro</option></select></div>
+        <div class="form-group"><label class="form-label">Estado</label><select class="form-select" id="beer-status"><option value="concept">Concepto</option><option value="fermenting">Fermentando</option><option value="aging">Añejando</option><option value="ready">Listo / Embotellado</option></select></div>
+        <div class="form-group"><label class="form-label">Fecha elaboración</label><input type="date" class="form-input" id="beer-date"></div>
+        <div class="form-group"><label class="form-label">Lote / Batch #</label><input type="text" class="form-input" id="beer-batch" placeholder="2025-001"></div>
+        <div class="form-group"><label class="form-label">OG</label><input type="number" class="form-input" id="beer-og" placeholder="1.060" step="0.001"></div>
+        <div class="form-group"><label class="form-label">FG</label><input type="number" class="form-input" id="beer-fg" placeholder="1.005" step="0.001"></div>
+        <div class="form-group"><label class="form-label">ABV %</label><input type="number" class="form-input" id="beer-abv" placeholder="7.2" step="0.1"></div>
+        <div class="form-group"><label class="form-label">IBU</label><input type="number" class="form-input" id="beer-ibu" placeholder="22"></div>
+        <div class="form-group"><label class="form-label">SRM</label><input type="number" class="form-input" id="beer-srm" placeholder="6"></div>
+        <div class="form-group"><label class="form-label">Volumen (L)</label><input type="number" class="form-input" id="beer-volume" placeholder="20"></div>
+        <div class="form-group form-full"><label class="form-label">Descripción / Notas generales</label><textarea class="form-textarea" id="beer-desc" placeholder="Describe la receta, inspiración, características deseadas..."></textarea></div>
+      </div>
+      <div class="divider"></div>
+      <!-- MALTAS -->
+      <div style="margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--accent2);">🌾 Maltas &amp; Adjuntos</div>
+          <button class="btn btn-ghost btn-sm" onclick="addRow('malts-table')">+ Añadir</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="ing-table" id="malts-table">
+            <thead><tr><th>Malta / Adjunto</th><th>Kg</th><th>°L</th><th>%</th><th></th></tr></thead>
+            <tbody id="malts-body">
+              <tr><td><input type="text" placeholder="Malta Pilsen"></td><td><input type="number" placeholder="4.0" step="0.1" style="width:65px;"></td><td><input type="number" placeholder="2" step="0.5" style="width:60px;"></td><td><input type="number" placeholder="85" style="width:55px;"></td><td><button class="btn btn-danger" style="padding:3px 7px;" onclick="removeRow(this)">×</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- LUPULOS -->
+      <div style="margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--accent2);">🌿 Lúpulos</div>
+          <button class="btn btn-ghost btn-sm" onclick="addRow('hops-table')">+ Añadir</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="ing-table" id="hops-table">
+            <thead><tr><th>Variedad</th><th>Gramos</th><th>AA%</th><th>Momento</th><th>Forma</th><th></th></tr></thead>
+            <tbody id="hops-body">
+              <tr><td><input type="text" placeholder="East Kent Goldings"></td><td><input type="number" placeholder="30" style="width:65px;"></td><td><input type="number" placeholder="5.5" step="0.1" style="width:55px;"></td><td><select style="font-size:12px;padding:4px;"><option>60 min</option><option>30 min</option><option>15 min</option><option>0 min (FO)</option><option>Dry Hop</option><option>Maceración</option></select></td><td><select style="font-size:12px;padding:4px;"><option>Pellet</option><option>Hoja</option><option>Lupulina</option></select></td><td><button class="btn btn-danger" style="padding:3px 7px;" onclick="removeRow(this)">×</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- LEVADURAS -->
+      <div style="margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--brett2);">🦠 Levaduras &amp; Bacterias</div>
+          <button class="btn btn-brett btn-sm" onclick="addRow('yeasts-table')">+ Añadir</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="ing-table" id="yeasts-table">
+            <thead><tr><th>Cepa / Nombre</th><th>Tipo</th><th>Lab</th><th>Inoculación</th><th>Aten.%</th><th></th></tr></thead>
+            <tbody id="yeasts-body">
+              <tr style="background:rgba(107,140,66,.05);"><td><input type="text" placeholder="B. bruxellensis WY5112"></td><td><select style="font-size:12px;padding:4px;"><option>Brettanomyces</option><option>Saccharomyces</option><option>Lactobacillus</option><option>Pediococcus</option><option>Acetobacter</option><option>Mezcla salvaje</option></select></td><td><input type="text" placeholder="Wyeast"></td><td><select style="font-size:12px;padding:4px;"><option>Primaria</option><option>Secundaria</option><option>Co-inoculación</option><option>Botella</option><option>Barrica</option></select></td><td><input type="number" placeholder="85" style="width:55px;"></td><td><button class="btn btn-danger" style="padding:3px 7px;" onclick="removeRow(this)">×</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- OTROS INGREDIENTES -->
+      <div style="margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--accent2);">🍊 Otros Ingredientes</div>
+          <button class="btn btn-ghost btn-sm" onclick="addRow('others-table')">+ Añadir</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="ing-table" id="others-table">
+            <thead><tr><th>Ingrediente</th><th>Cantidad</th><th>Unidad</th><th>Momento</th><th></th></tr></thead>
+            <tbody id="others-body"></tbody>
+          </table>
+        </div>
+        <div style="margin-top:6px;font-size:12px;color:var(--text4);">Frutas, especias, madera, miel...</div>
+      </div>
+      <div class="divider"></div>
+      <!-- PROCESO -->
+      <div style="margin-bottom:16px;">
+        <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--accent2);margin-bottom:10px;">⚗️ Proceso</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Temp. maceración (°C)</label><input type="number" class="form-input" id="proc-mash-temp" placeholder="65"></div>
+          <div class="form-group"><label class="form-label">Duración maceración (min)</label><input type="number" class="form-input" id="proc-mash-time" placeholder="60"></div>
+          <div class="form-group"><label class="form-label">Temp. fermentación primaria</label><input type="number" class="form-input" id="proc-ferm-temp" placeholder="22"></div>
+          <div class="form-group"><label class="form-label">Duración fermentación (días)</label><input type="number" class="form-input" id="proc-ferm-time" placeholder="14"></div>
+          <div class="form-group"><label class="form-label">Temp. brett / secundaria</label><input type="number" class="form-input" id="proc-brett-temp" placeholder="24"></div>
+          <div class="form-group"><label class="form-label">Duración añejamiento (meses)</label><input type="number" class="form-input" id="proc-aging-time" placeholder="6"></div>
+          <div class="form-group form-full"><label class="form-label">Contenedor de añejamiento</label><select class="form-select" id="proc-vessel"><option>Fermentador plástico (PET)</option><option>Barrica ex-bourbon (225L)</option><option>Barrica ex-vino tinto (225L)</option><option>Barrica ex-jerez</option><option>Damajuana de vidrio</option><option>Fermentador acero inox</option><option>Solera / Blend</option><option>Otro</option></select></div>
+          <div class="form-group form-full"><label class="form-label">Notas de proceso</label><textarea class="form-textarea" id="proc-notes" placeholder="Pasos específicos, observaciones, problemas encontrados..."></textarea></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <!-- CATA RAPIDA -->
+      <div style="margin-bottom:16px;">
+        <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--accent2);margin-bottom:10px;">👃 Notas de Cata Rápida</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Nariz / Aroma</label><textarea class="form-textarea" id="taste-nose" placeholder="Aromas detectados..."></textarea></div>
+          <div class="form-group"><label class="form-label">Boca / Paladar</label><textarea class="form-textarea" id="taste-palate" placeholder="Sabores, cuerpo, carbonatación..."></textarea></div>
+          <div class="form-group form-full"><label class="form-label">Perfil Brett</label><textarea class="form-textarea" id="taste-brett" placeholder="Carácter brett: cuero, establo, tropical, terroso..."></textarea></div>
+        </div>
+        <div class="form-group" style="margin-top:10px;">
+          <label class="form-label">Valoración personal</label>
+          <div class="rating-stars" id="modal-stars">
+            <span class="star" onclick="setRating(1)">★</span><span class="star" onclick="setRating(2)">★</span><span class="star" onclick="setRating(3)">★</span><span class="star" onclick="setRating(4)">★</span><span class="star" onclick="setRating(5)">★</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;padding-top:16px;border-top:1px solid var(--border2);">
+        <button class="btn btn-ghost" onclick="closeBeerModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveBeer()">💾 Guardar Receta</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: DETALLE RECETA ===== -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal" style="max-width:900px;">
+    <div class="modal-header">
+      <div class="modal-title">Detalle de Receta</div>
+      <div class="modal-header-actions">
+        <button class="btn btn-ghost btn-sm" onclick="editCurrentBeer()">✏️ Editar</button>
+        <button class="btn btn-danger" onclick="deleteCurrentBeer()">🗑</button>
+        <button class="modal-close" onclick="closeDetailModal()">×</button>
+      </div>
+    </div>
+    <div class="modal-body modal-body-scroll" id="detail-body"></div>
+  </div>
+</div>
+
+<!-- ===== MODAL: BODEGA NUEVA/EDITAR ===== -->
+<div class="modal-overlay" id="cellar-modal">
+  <div class="modal" style="max-width:680px;">
+    <div class="modal-header">
+      <div class="modal-title" id="cellar-modal-title">Nueva Referencia de Bodega</div>
+      <button class="modal-close" onclick="closeCellarModal()">×</button>
+    </div>
+    <div class="modal-body modal-body-scroll">
+      <div class="form-group" style="margin-bottom:18px;">
+        <label class="form-label">📷 Foto de la Botella</label>
+        <div id="cellar-photo-container" style="display:none;margin-bottom:8px;text-align:center;">
+          <img id="cellar-photo-preview" class="photo-preview" src="">
+          <button class="btn btn-danger btn-sm" style="margin-top:4px;" onclick="removePhoto('cellar')">Eliminar</button>
+        </div>
+        <label class="photo-upload-btn" for="cellar-photo-input">🍾 Subir foto de la botella</label>
+        <input type="file" id="cellar-photo-input" accept="image/*" onchange="handlePhotoUpload(event,'cellar')">
+      </div>
+      <div class="form-grid">
+        <div class="form-group form-full"><label class="form-label">Nombre de la referencia *</label><input type="text" class="form-input" id="cellar-name" placeholder="Ej: La Bestia Peluda #3 — 2024"></div>
+        <div class="form-group"><label class="form-label">Estilo / Descripción</label><input type="text" class="form-input" id="cellar-style" placeholder="Brett Saison, Farmhouse..."></div>
+        <div class="form-group"><label class="form-label">Fecha embotellado / Añada</label><input type="date" class="form-input" id="cellar-vintage"></div>
+        <div class="form-group"><label class="form-label">Tipo de botella</label>
+          <select class="form-select" id="cellar-bottle-type">
+            <option value="0.33">33cl (0,33L)</option>
+            <option value="0.375">37,5cl (0,375L)</option>
+            <option value="0.5">50cl (0,5L)</option>
+            <option value="0.75" selected>75cl (0,75L)</option>
+            <option value="1.5">Magnum 150cl (1,5L)</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Stock inicial (botellas) *</label><input type="number" class="form-input" id="cellar-stock" placeholder="24" min="0"></div>
+        <div class="form-group"><label class="form-label">ABV %</label><input type="number" class="form-input" id="cellar-abv" placeholder="7.2" step="0.1"></div>
+        <div class="form-group form-full"><label class="form-label">Notas</label><textarea class="form-textarea" id="cellar-notes" placeholder="Características, ingredientes especiales, proceso, maridaje..."></textarea></div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:16px;border-top:1px solid var(--border2);">
+        <button class="btn btn-ghost" onclick="closeCellarModal()">Cancelar</button>
+        <button class="btn btn-cellar" onclick="saveCellarEntry()">🍾 Guardar en Bodega</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: SACAR BOTELLAS ===== -->
+<div class="modal-overlay" id="cellar-deduct-modal">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-header">
+      <div class="modal-title">Sacar Botellas de Bodega</div>
+      <button class="modal-close" onclick="document.getElementById('cellar-deduct-modal').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:16px;background:var(--bg3);border-radius:8px;padding:14px;border:1px solid var(--border2);">
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text);" id="deduct-ref-name">—</div>
+        <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text4);margin-top:4px;">Stock actual: <span id="deduct-current-stock" style="color:var(--accent2);font-weight:700;">0</span> botellas</div>
+      </div>
+      <div class="form-group" style="margin-bottom:14px;"><label class="form-label">Botellas a sacar</label><input type="number" class="form-input" id="deduct-qty" placeholder="1" min="1"></div>
+      <div class="form-group" style="margin-bottom:14px;"><label class="form-label">Fecha</label><input type="date" class="form-input" id="deduct-date"></div>
+      <div class="form-group" style="margin-bottom:16px;"><label class="form-label">Motivo / Nota</label><input type="text" class="form-input" id="deduct-note" placeholder="Cata, regalo, consumo, evento..."></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn btn-ghost" onclick="document.getElementById('cellar-deduct-modal').classList.remove('open')">Cancelar</button>
+        <button class="btn btn-danger" style="font-size:11px;padding:8px 16px;" onclick="executeDeduct()">− Sacar Botellas</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: DETALLE BODEGA ===== -->
+<div class="modal-overlay" id="cellar-detail-modal">
+  <div class="modal" style="max-width:760px;">
+    <div class="modal-header">
+      <div class="modal-title" id="cd-title">Referencia de Bodega</div>
+      <div class="modal-header-actions">
+        <button class="btn btn-cellar btn-sm" onclick="openDeductModal()">− Sacar botellas</button>
+        <button class="btn btn-ghost btn-sm" onclick="editCellarEntry()">✏️ Editar</button>
+        <button class="btn btn-danger" onclick="deleteCellarEntry()">🗑</button>
+        <button class="modal-close" onclick="document.getElementById('cellar-detail-modal').classList.remove('open')">×</button>
+      </div>
+    </div>
+    <div class="modal-body modal-body-scroll" id="cellar-detail-body"></div>
+  </div>
+</div>
+
+<!-- ===== MODAL: NUEVA CATA BJCP ===== -->
+<div class="modal-overlay" id="cata-modal">
+  <div class="modal" style="max-width:860px;">
+    <div class="modal-header">
+      <div class="modal-title" id="cata-modal-title">Nueva Cata BJCP</div>
+      <button class="modal-close" onclick="closeCataModal()">×</button>
+    </div>
+    <div class="modal-body modal-body-scroll">
+      <!-- FOTO -->
+      <div class="form-group" style="margin-bottom:18px;">
+        <label class="form-label">📷 Foto de la cerveza</label>
+        <div id="cata-photo-container" style="display:none;margin-bottom:8px;text-align:center;">
+          <img id="cata-photo-preview" class="photo-preview" src="">
+          <button class="btn btn-danger btn-sm" style="margin-top:4px;" onclick="removePhoto('cata')">Eliminar</button>
+        </div>
+        <label class="photo-upload-btn" for="cata-photo-input">📷 Subir foto</label>
+        <input type="file" id="cata-photo-input" accept="image/*" onchange="handlePhotoUpload(event,'cata')">
+      </div>
+      <!-- INFO BASICA -->
+      <div class="form-grid">
+        <div class="form-group form-full"><label class="form-label">Nombre de la cerveza catada *</label><input type="text" class="form-input" id="cata-beer-name" placeholder="Nombre del beer catado"></div>
+        <div class="form-group"><label class="form-label">Estilo BJCP</label>
+          <select class="form-select" id="cata-style">
+            <option>28A. Brett Beer</option><option>28B. Mixed-Fermentation Sour Beer</option><option>28C. Wild Specialty Beer</option>
+            <option>23A. Berliner Weisse</option><option>23B. Flanders Red Ale</option><option>23C. Oud Bruin</option>
+            <option>23D. Lambic</option><option>23E. Gueuze</option><option>23F. Fruit Lambic</option>
+            <option>25B. Saison</option><option>27A. Experimental Beer</option><option>Otro estilo</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Fecha de cata</label><input type="date" class="form-input" id="cata-date"></div>
+        <div class="form-group"><label class="form-label">Añada / Vintage</label><input type="text" class="form-input" id="cata-vintage" placeholder="2023, Primavera 2024..."></div>
+        <div class="form-group"><label class="form-label">Temperatura servicio (°C)</label><input type="number" class="form-input" id="cata-temp" placeholder="10" step="0.5"></div>
+        <div class="form-group"><label class="form-label">Copa / Cristalería</label><input type="text" class="form-input" id="cata-glass" placeholder="Tulipa, Chalice, Copa vino..."></div>
+        <div class="form-group"><label class="form-label">Referencia bodega</label><select class="form-select" id="cata-cellar-ref"><option value="">— Sin referencia —</option></select></div>
+        <div class="form-group"><label class="form-label">Meses de guarda desde embotellado</label><input type="number" class="form-input" id="cata-aging-months" placeholder="6" min="0"></div>
+      </div>
+      <div class="divider"></div>
+      <!-- TOTAL BJCP -->
+      <div class="bjcp-total-display">
+        <div class="bjcp-total-number" id="bjcp-total-display">0</div>
+        <div class="bjcp-total-label">Puntos BJCP — de 50</div>
+        <div class="bjcp-rank-display" id="bjcp-rank-display" style="color:var(--text4);">—</div>
+      </div>
+      <!-- AROMA /12 -->
+      <div class="bjcp-section">
+        <div class="bjcp-section-header">
+          <div><div class="bjcp-section-title">👃 Aroma</div><div class="bjcp-section-sub">Intensidad y calidad: malta, lúpulo, fermentación, brett</div></div>
+          <div class="bjcp-section-score"><input type="number" class="bjcp-score-input" id="score-aroma" min="0" max="12" value="0" oninput="updateBJCPTotal()"><span class="bjcp-score-max-label">&nbsp;/ 12</span></div>
+        </div>
+        <div class="bjcp-section-body">
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">Aromas de malta</label><textarea class="form-textarea" id="aroma-malt" placeholder="Pan, galleta, caramelo, tostado, cereal..." style="min-height:60px;"></textarea></div>
+            <div class="form-group"><label class="form-label">Aromas de lúpulo</label><textarea class="form-textarea" id="aroma-hops" placeholder="Herbal, floral, cítrico, resinoso..." style="min-height:60px;"></textarea></div>
+            <div class="form-group"><label class="form-label">Carácter de fermentación</label><textarea class="form-textarea" id="aroma-ferm" placeholder="Frutas, ésteres, fenoles, alcohol..." style="min-height:60px;"></textarea></div>
+            <div class="form-group"><label class="form-label">🦠 Carácter Brett / Bacteria</label><textarea class="form-textarea" id="aroma-brett" placeholder="Cuero, establo, tropical, terroso, láctico, acético..." style="min-height:60px;"></textarea></div>
+          </div>
+        </div>
+      </div>
+      <!-- APARIENCIA /3 -->
+      <div class="bjcp-section">
+        <div class="bjcp-section-header">
+          <div><div class="bjcp-section-title">👁️ Apariencia</div><div class="bjcp-section-sub">Color, claridad, espuma</div></div>
+          <div class="bjcp-section-score"><input type="number" class="bjcp-score-input" id="score-appearance" min="0" max="3" value="0" oninput="updateBJCPTotal()"><span class="bjcp-score-max-label">&nbsp;/ 3</span></div>
+        </div>
+        <div class="bjcp-section-body">
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">Color (descripción)</label><input type="text" class="form-input" id="app-color" placeholder="Dorado pálido, ámbar, bronce, cobre..."></div>
+            <div class="form-group"><label class="form-label">Claridad</label><select class="form-select" id="app-clarity"><option>Brillante</option><option>Cristalina</option><option>Levemente velada</option><option>Velada (Hazy)</option><option>Turbia</option><option>Opaca</option></select></div>
+            <div class="form-group"><label class="form-label">Espuma (cabeza)</label><input type="text" class="form-input" id="app-head" placeholder="Blanca, fina, persistente, cremosa, efímera..."></div>
+            <div class="form-group"><label class="form-label">Carbonatación visible</label><select class="form-select" id="app-carbonation"><option>Sin observar</option><option>Baja</option><option>Media</option><option>Alta</option><option>Muy alta (champán)</option></select></div>
+          </div>
+        </div>
+      </div>
+      <!-- SABOR /20 -->
+      <div class="bjcp-section">
+        <div class="bjcp-section-header">
+          <div><div class="bjcp-section-title">👅 Sabor</div><div class="bjcp-section-sub">Perfil completo, equilibrio y retrogusto</div></div>
+          <div class="bjcp-section-score"><input type="number" class="bjcp-score-input" id="score-flavor" min="0" max="20" value="0" oninput="updateBJCPTotal()"><span class="bjcp-score-max-label">&nbsp;/ 20</span></div>
+        </div>
+        <div class="bjcp-section-body">
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">Sabores de malta</label><textarea class="form-textarea" id="flavor-malt" placeholder="Cereal, caramelo, tostado..." style="min-height:60px;"></textarea></div>
+            <div class="form-group"><label class="form-label">Amargor / Lúpulo</label><textarea class="form-textarea" id="flavor-hops" placeholder="Amargor, herbal, floral, cítrico..." style="min-height:60px;"></textarea></div>
+            <div class="form-group"><label class="form-label">Sabores de fermentación</label><textarea class="form-textarea" id="flavor-ferm" placeholder="Ésteres, frutas, especias, alcohol..." style="min-height:60px;"></textarea></div>
+            <div class="form-group"><label class="form-label">🦠 Sabor Brett / Bacteria</label><textarea class="form-textarea" id="flavor-brett" placeholder="Cuero, terroso, tropical, funky..." style="min-height:60px;"></textarea></div>
+            <div class="form-group"><label class="form-label">Acidez</label><select class="form-select" id="flavor-acidity"><option>Sin acidez</option><option>Leve acidez láctica</option><option>Acidez láctica moderada</option><option>Acidez láctica alta</option><option>Leve acidez acética</option><option>Acidez acética notable</option><option>Complejo láctico + acético</option></select></div>
+            <div class="form-group"><label class="form-label">Retrogusto / Finish</label><textarea class="form-textarea" id="flavor-finish" placeholder="Largo, seco, amargo, dulce, terroso, limpio..." style="min-height:60px;"></textarea></div>
+          </div>
+        </div>
+      </div>
+      <!-- SENSACION /5 -->
+      <div class="bjcp-section">
+        <div class="bjcp-section-header">
+          <div><div class="bjcp-section-title">✋ Sensación en Boca</div><div class="bjcp-section-sub">Cuerpo, carbonatación, calidez, astringencia</div></div>
+          <div class="bjcp-section-score"><input type="number" class="bjcp-score-input" id="score-mouthfeel" min="0" max="5" value="0" oninput="updateBJCPTotal()"><span class="bjcp-score-max-label">&nbsp;/ 5</span></div>
+        </div>
+        <div class="bjcp-section-body">
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">Cuerpo</label><select class="form-select" id="mf-body"><option>Muy ligero</option><option>Ligero</option><option>Ligero-medio</option><option>Medio</option><option>Medio-pleno</option><option>Pleno</option></select></div>
+            <div class="form-group"><label class="form-label">Carbonatación</label><select class="form-select" id="mf-carb"><option>Muy baja</option><option>Baja</option><option>Media-baja</option><option>Media</option><option>Media-alta</option><option>Alta</option><option>Muy alta (Champán)</option></select></div>
+            <div class="form-group"><label class="form-label">Calidez / Alcohol</label><select class="form-select" id="mf-warmth"><option>Sin notar</option><option>Leve calidez</option><option>Calidez moderada</option><option>Calidez notable</option><option>Ardor fuerte</option></select></div>
+            <div class="form-group"><label class="form-label">Astringencia / Sequedad</label><select class="form-select" id="mf-astringency"><option>Sin astringencia</option><option>Leve sequedad</option><option>Sequedad marcada</option><option>Astringencia leve</option><option>Astringencia notable</option></select></div>
+            <div class="form-group form-full"><label class="form-label">Notas adicionales</label><textarea class="form-textarea" id="mf-notes" placeholder="Cremosidad, efervescencia, picor, taninos..." style="min-height:55px;"></textarea></div>
+          </div>
+        </div>
+      </div>
+      <!-- GENERAL /10 -->
+      <div class="bjcp-section">
+        <div class="bjcp-section-header">
+          <div><div class="bjcp-section-title">⭐ Impresión General</div><div class="bjcp-section-sub">Valoración global, tipicidad del estilo, defectos</div></div>
+          <div class="bjcp-section-score"><input type="number" class="bjcp-score-input" id="score-overall" min="0" max="10" value="0" oninput="updateBJCPTotal()"><span class="bjcp-score-max-label">&nbsp;/ 10</span></div>
+        </div>
+        <div class="bjcp-section-body">
+          <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Valoración narrativa</label><textarea class="form-textarea" id="overall-notes" placeholder="Descripción global, evolución en copa, qué destaca, maridaje sugerido..." style="min-height:90px;"></textarea></div>
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">Defectos detectados</label><textarea class="form-textarea" id="overall-faults" placeholder="Mouse, DMS, oxidación, exceso de acético..." style="min-height:55px;"></textarea></div>
+            <div class="form-group"><label class="form-label">Potencial de guarda</label><select class="form-select" id="overall-aging"><option>Beber ahora</option><option>1–2 años más</option><option>2–5 años</option><option>5–10 años</option><option>+10 años</option><option>En su punto óptimo</option><option>Ha pasado su pico</option></select></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:16px;border-top:1px solid var(--border2);">
+        <button class="btn btn-ghost" onclick="closeCataModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveCata()">💾 Guardar Cata</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: DETALLE CATA ===== -->
+<div class="modal-overlay" id="cata-detail-modal">
+  <div class="modal" style="max-width:800px;">
+    <div class="modal-header">
+      <div class="modal-title">Hoja de Cata BJCP</div>
+      <div class="modal-header-actions">
+        <button class="btn btn-ghost btn-sm" onclick="editCurrentCata()">✏️ Editar</button>
+        <button class="btn btn-danger" onclick="deleteCurrentCata()">🗑</button>
+        <button class="modal-close" onclick="document.getElementById('cata-detail-modal').classList.remove('open')">×</button>
+      </div>
+    </div>
+    <div class="modal-body modal-body-scroll" id="cata-detail-body"></div>
+  </div>
+</div>
+
+<div class="version-badge">Brett Lab v3.0 — 🐙 Octopalomo BCN</div>
+
+<script>
+// ========== DATA STORE ==========
+let DB = JSON.parse(localStorage.getItem('Brett_db_v3') || '{"beers":[],"cellar":[],"tastings":[]}');
+if (!DB.cellar) DB.cellar = [];
+if (!DB.tastings) DB.tastings = [];
+
+let currentBeerIndex = null;
+let currentCellarIndex = null;
+let currentCataIndex = null;
+let currentRating = 0;
+let currentPhotos = { label: null, cellar: null, cata: null };
+let editingBeerIndex = null;
+let editingCellarIndex = null;
+let editingCataIndex = null;
+
+function saveDB() {
+  try {
+    localStorage.setItem('Brett_db_v3', JSON.stringify(DB));
+  } catch(e) {
+    alert('⚠️ Error al guardar: el almacenamiento está lleno. Ve a "Exportar / Importar" → exporta tu backup y luego limpia imágenes grandes.');
+    console.error('saveDB error:', e);
+  }
+  updateStats();
+  updateAllBadges();
+  updateStorageInfo();
+}
+
+function updateAllBadges() {
+  document.getElementById('nav-badge-catalog').textContent = DB.beers.length;
+  document.getElementById('nav-badge-cellar').textContent = DB.cellar.length;
+  document.getElementById('nav-badge-catas').textContent = DB.tastings.length;
+}
+
+function updateStats() {
+  document.getElementById('stat-total').textContent = DB.beers.length;
+  const brettCount = DB.beers.filter(b => b.yeasts && b.yeasts.some(y => y.type === 'Brettanomyces' || y.type === 'Mezcla salvaje')).length;
+  document.getElementById('stat-brett').textContent = brettCount;
+  const totalBottles = DB.cellar.reduce((s, c) => s + (c.currentStock || 0), 0);
+  document.getElementById('stat-cellar-bottles').textContent = totalBottles;
+  document.getElementById('stat-tastings').textContent = DB.tastings.length;
+  renderDashboard();
+  updateExportInfo();
+}
+
+function updateStorageInfo() {
+  const data = localStorage.getItem('Brett_db_v3') || '';
+  const kb = (data.length / 1024).toFixed(1);
+  const el = document.getElementById('storage-info');
+  if (el) el.innerHTML = `<strong>Recetas:</strong> ${DB.beers.length} &nbsp;|&nbsp; <strong>Bodega:</strong> ${DB.cellar.length} ref. &nbsp;|&nbsp; <strong>Catas:</strong> ${DB.tastings.length}<br><strong>Tamaño:</strong> ${kb} KB (localStorage)<br><em style="color:var(--text4);">Exporta regularmente para hacer backup.</em>`;
+}
+
+function updateExportInfo() {
+  const el = document.getElementById('export-info');
+  if (el) el.textContent = `${DB.beers.length} recetas · ${DB.cellar.length} bodega · ${DB.tastings.length} catas`;
+}
+
+// ========== MOBILE NAV ==========
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+
+// ========== NAVIGATION ==========
+function showPage(page, navEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById('page-' + page);
+  if (el) el.classList.add('active');
+  if (navEl) navEl.classList.add('active');
+  else {
+    // Try to find nav item by data or content match
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + page + "'")) n.classList.add('active');
+    });
+  }
+  const titles = { dashboard: 'Dashboard', catalog: 'Catálogo de Recetas', cellar: 'Bodega', catas: 'Catas BJCP', calculators: 'Calculadoras', reference: 'Enciclopedia Brett', data: 'Gestión de Datos' };
+  document.getElementById('topbar-title').textContent = titles[page] || page;
+  closeSidebar();
+  if (page === 'catalog') renderCatalog();
+  if (page === 'cellar') { renderCellar(); updateCellarSummary(); }
+  if (page === 'catas') renderCatas();
+  if (page === 'data') updateStorageInfo();
+}
+
+// ========== BEER MODAL ==========
+function openNewBeerModal() {
+  editingBeerIndex = null;
+  currentPhotos.label = null;
+  currentRating = 0;
+  document.getElementById('modal-title-text').textContent = 'Nueva Receta Brett';
+  clearBeerForm();
+  document.getElementById('beer-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('beer-modal').classList.add('open');
+}
+function closeBeerModal() { document.getElementById('beer-modal').classList.remove('open'); }
+function closeDetailModal() { document.getElementById('detail-modal').classList.remove('open'); currentBeerIndex = null; }
+
+function clearBeerForm() {
+  ['beer-name','beer-batch','beer-og','beer-fg','beer-abv','beer-ibu','beer-srm','beer-volume','beer-desc',
+   'proc-mash-temp','proc-mash-time','proc-ferm-temp','proc-ferm-time','proc-brett-temp','proc-aging-time','proc-notes',
+   'taste-nose','taste-palate','taste-brett'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('beer-style').value = 'Brett Saison';
+  document.getElementById('beer-status').value = 'concept';
+  document.getElementById('proc-vessel').value = 'Fermentador plástico (PET)';
+  resetIngTables();
+  document.getElementById('label-preview').src = '';
+  document.getElementById('label-preview-container').style.display = 'none';
+  setRating(0);
+}
+
+function resetIngTables() {
+  document.getElementById('malts-body').innerHTML = `<tr><td><input type="text" placeholder="Malta Pilsen"></td><td><input type="number" placeholder="4.0" step="0.1" style="width:65px;"></td><td><input type="number" placeholder="2" step="0.5" style="width:60px;"></td><td><input type="number" placeholder="85" style="width:55px;"></td><td><button class="btn btn-danger" style="padding:3px 7px;" onclick="removeRow(this)">×</button></td></tr>`;
+  document.getElementById('hops-body').innerHTML = `<tr><td><input type="text" placeholder="East Kent Goldings"></td><td><input type="number" placeholder="30" style="width:65px;"></td><td><input type="number" placeholder="5.5" step="0.1" style="width:55px;"></td><td><select style="font-size:12px;padding:4px;"><option>60 min</option><option>30 min</option><option>15 min</option><option>0 min (FO)</option><option>Dry Hop</option><option>Maceración</option></select></td><td><select style="font-size:12px;padding:4px;"><option>Pellet</option><option>Hoja</option><option>Lupulina</option></select></td><td><button class="btn btn-danger" style="padding:3px 7px;" onclick="removeRow(this)">×</button></td></tr>`;
+  document.getElementById('yeasts-body').innerHTML = `<tr style="background:rgba(107,140,66,.05);"><td><input type="text" placeholder="B. bruxellensis WY5112"></td><td><select style="font-size:12px;padding:4px;"><option>Brettanomyces</option><option>Saccharomyces</option><option>Lactobacillus</option><option>Pediococcus</option><option>Acetobacter</option><option>Mezcla salvaje</option></select></td><td><input type="text" placeholder="Wyeast"></td><td><select style="font-size:12px;padding:4px;"><option>Primaria</option><option>Secundaria</option><option>Co-inoculación</option><option>Botella</option><option>Barrica</option></select></td><td><input type="number" placeholder="85" style="width:55px;"></td><td><button class="btn btn-danger" style="padding:3px 7px;" onclick="removeRow(this)">×</button></td></tr>`;
+  document.getElementById('others-body').innerHTML = '';
+}
+
+function addRow(tableId) {
+  const tbody = document.getElementById(tableId.replace('-table', '-body'));
+  const tr = document.createElement('tr');
+  if (tableId === 'malts-table') {
+    tr.innerHTML = `<td><input type="text" placeholder="Malta..."></td><td><input type="number" placeholder="0.5" step="0.1" style="width:65px;"></td><td><input type="number" placeholder="10" style="width:60px;"></td><td><input type="number" placeholder="10" style="width:55px;"></td><td><button class="btn btn-danger" style="padding:3px 7px;" onclick="removeRow(this)">×</button></td>`;
+  } else if (tableId === 'hops-table') {
+    tr.innerHTML = `<td><input type="text" placeholder="Variedad..."></td><td><input type="number" placeholder="20" style="width:65px;"></td><td><input type="number" placeholder="5" step="0.1" style="width:55px;"></td><td><select style="font-size:12px;padding:4px;"><option>60 min</option><option>30 min</option><option>15 min</option><option>0 min (FO)</option><option>Dry Hop</option><option>Maceración</option></select></td><td><select style="font-size:12px;padding:4px;"><option>Pellet</option><option>Hoja</option><option>Lupulina</option></select></td><td><button class="btn btn-danger" style="padding:3px 7px;" onclick="removeRow(this)">×</button></td>`;
+  } else if (tableId === 'yeasts-table') {
+    tr.style.background = 'rgba(107,140,66,.05)';
+    tr.innerHTML = `<td><input type="text" placeholder="Cepa..."></td><td><select style="font-size:12px;padding:4px;"><option>Brettanomyces</option><option>Saccharomyces</option><option>Lactobacillus</option><option>Pediococcus</option><option>Acetobacter</option><option>Mezcla salvaje</option></select></td><td><input type="text" placeholder="Lab"></td><td><select style="font-size:12px;padding:4px;"><option>Primaria</option><option>Secundaria</option><option>Co-inoculación</option><option>Botella</option><option>Barrica</option></select></td><td><input type="number" placeholder="80" style="width:55px;"></td><td><button class="btn btn-danger" style="padding:3px 7px;" onclick="removeRow(this)">×</button></td>`;
+  } else if (tableId === 'others-table') {
+    tr.innerHTML = `<td><input type="text" placeholder="Ingrediente..."></td><td><input type="number" placeholder="100" style="width:75px;"></td><td><select style="font-size:12px;padding:4px;"><option>g</option><option>kg</option><option>ml</option><option>L</option><option>unidades</option></select></td><td><select style="font-size:12px;padding:4px;"><option>Hervor</option><option>Maceración</option><option>Fermentación</option><option>Secundaria</option><option>Botella</option></select></td><td><button class="btn btn-danger" style="padding:3px 7px;" onclick="removeRow(this)">×</button></td>`;
+  }
+  tbody.appendChild(tr);
+}
+function removeRow(btn) { btn.closest('tr').remove(); }
+
+function setRating(n) {
+  currentRating = n;
+  document.querySelectorAll('#modal-stars .star').forEach((s, i) => s.classList.toggle('filled', i < n));
+}
+
+function handlePhotoUpload(e, type) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    currentPhotos[type] = ev.target.result;
+    if (type === 'label') { document.getElementById('label-preview').src = currentPhotos.label; document.getElementById('label-preview-container').style.display = 'block'; }
+    else if (type === 'cellar') { document.getElementById('cellar-photo-preview').src = currentPhotos.cellar; document.getElementById('cellar-photo-container').style.display = 'block'; }
+    else if (type === 'cata') { document.getElementById('cata-photo-preview').src = currentPhotos.cata; document.getElementById('cata-photo-container').style.display = 'block'; }
+  };
+  reader.readAsDataURL(file);
+}
+function removePhoto(type) {
+  currentPhotos[type] = null;
+  if (type === 'label') { document.getElementById('label-preview').src = ''; document.getElementById('label-preview-container').style.display = 'none'; document.getElementById('label-photo-input').value = ''; }
+  if (type === 'cellar') { document.getElementById('cellar-photo-preview').src = ''; document.getElementById('cellar-photo-container').style.display = 'none'; document.getElementById('cellar-photo-input').value = ''; }
+  if (type === 'cata') { document.getElementById('cata-photo-preview').src = ''; document.getElementById('cata-photo-container').style.display = 'none'; document.getElementById('cata-photo-input').value = ''; }
+}
+
+function getTableData(bodyId) {
+  return Array.from(document.getElementById(bodyId).querySelectorAll('tr')).map(row =>
+    Array.from(row.querySelectorAll('input,select')).map(i => i.value)
+  ).filter(r => r.some(v => v));
+}
+
+function saveBeer() {
+  const name = document.getElementById('beer-name').value.trim();
+  if (!name) { alert('Por favor, añade un nombre a la receta.'); return; }
+  const maltsRows = getTableData('malts-body');
+  const hopsRows = getTableData('hops-body');
+  const yeastsRows = getTableData('yeasts-body');
+  const othersRows = getTableData('others-body');
+  const beer = {
+    id: editingBeerIndex !== null ? DB.beers[editingBeerIndex].id : Date.now(),
+    name, style: document.getElementById('beer-style').value,
+    status: document.getElementById('beer-status').value,
+    date: document.getElementById('beer-date').value,
+    batch: document.getElementById('beer-batch').value,
+    og: document.getElementById('beer-og').value, fg: document.getElementById('beer-fg').value,
+    abv: document.getElementById('beer-abv').value, ibu: document.getElementById('beer-ibu').value,
+    srm: document.getElementById('beer-srm').value, volume: document.getElementById('beer-volume').value,
+    desc: document.getElementById('beer-desc').value,
+    photo: currentPhotos.label,
+    malts: maltsRows.map(r => ({ name: r[0], kg: r[1], lovibond: r[2], pct: r[3] })),
+    hops: hopsRows.map(r => ({ variety: r[0], grams: r[1], aa: r[2], timing: r[3], form: r[4] })),
+    yeasts: yeastsRows.map(r => ({ name: r[0], type: r[1], lab: r[2], stage: r[3], attenuation: r[4] })),
+    others: othersRows.map(r => ({ ingredient: r[0], amount: r[1], unit: r[2], timing: r[3] })),
+    process: { mashTemp: document.getElementById('proc-mash-temp').value, mashTime: document.getElementById('proc-mash-time').value, fermTemp: document.getElementById('proc-ferm-temp').value, fermTime: document.getElementById('proc-ferm-time').value, brettTemp: document.getElementById('proc-brett-temp').value, agingTime: document.getElementById('proc-aging-time').value, vessel: document.getElementById('proc-vessel').value, notes: document.getElementById('proc-notes').value },
+    tasting: { nose: document.getElementById('taste-nose').value, palate: document.getElementById('taste-palate').value, brett: document.getElementById('taste-brett').value, rating: currentRating },
+    createdAt: editingBeerIndex !== null ? DB.beers[editingBeerIndex].createdAt : new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  if (editingBeerIndex !== null) DB.beers[editingBeerIndex] = beer; else DB.beers.unshift(beer);
+  saveDB(); closeBeerModal(); renderCatalog();
+}
+
+// ========== HELPERS ==========
+function srmToColor(srm) {
+  const c = ['#F3F993','#F5F75C','#F6F513','#EAE01B','#E0C519','#D4AB19','#C89A18','#BC8C16','#B17E15','#A47213','#986611','#8C5C10','#7F530F','#74490D','#68400C','#5E380B','#54300A','#4B2908','#422307','#3A1E06','#321805','#2B1404','#241003','#1D0C02','#160801','#110601','#0D0401','#0A0301','#080201','#060101'];
+  return c[Math.min(Math.max(Math.round(srm) - 1, 0), c.length - 1)] || '#888';
+}
+function statusLabel(s) { return { fermenting: 'Fermentando', aging: 'Añejando', ready: 'Listo', concept: 'Concepto' }[s] || s; }
+
+// ========== BEER CARD ==========
+function renderBeerCard(beer, index) {
+  const hasBrett = beer.yeasts && beer.yeasts.some(y => y.type === 'Brettanomyces' || y.type === 'Mezcla salvaje');
+  const srmColor = beer.srm ? srmToColor(parseInt(beer.srm)) : '';
+  const stars = '★'.repeat(beer.tasting?.rating || 0) + '☆'.repeat(5 - (beer.tasting?.rating || 0));
+  return `<div class="beer-card" onclick="openBeerDetail(${index})">
+    <div class="beer-card-label">
+      ${beer.photo ? `<img src="${beer.photo}" alt="${beer.name}">` : `<div class="beer-card-label-placeholder"><span style="font-size:36px;">🍺</span><span>Sin etiqueta</span></div>`}
+      ${srmColor ? `<div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:${srmColor};"></div>` : ''}
+      <div class="beer-style-badge">${hasBrett ? '🦠 ' : ''}${beer.style || 'Wild Ale'}</div>
+    </div>
+    <div class="beer-card-body">
+      <div class="beer-card-name">${beer.name}</div>
+      <div class="beer-card-vintage">${beer.date ? new Date(beer.date).getFullYear() : '—'}${beer.batch ? ' · ' + beer.batch : ''}</div>
+      <div class="beer-card-stats">
+        <div class="beer-mini-stat"><div class="val">${beer.abv || '—'}%</div><div class="lbl">ABV</div></div>
+        <div class="beer-mini-stat"><div class="val">${beer.ibu || '—'}</div><div class="lbl">IBU</div></div>
+        <div class="beer-mini-stat"><div class="val" style="color:${srmColor || 'var(--text3)'};">${beer.srm || '—'}</div><div class="lbl">SRM</div></div>
+      </div>
+    </div>
+    <div class="beer-card-footer">
+      <div><span class="status-dot ${beer.status}"></span><span class="status-text">${statusLabel(beer.status)}</span></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="btn-edit-card" onclick="event.stopPropagation();editBeerDirectly(${index})">✏️ Editar</button>
+        <div style="font-size:14px;color:var(--accent2);">${stars}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderDashboard() {
+  const grid = document.getElementById('dashboard-recent-grid');
+  const beers = DB.beers.slice(0, 6);
+  if (!beers.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🍶</div><div class="empty-state-title">Sin elaboraciones aún</div><div class="empty-state-sub">Crea tu primera receta salvaje</div><button class="btn btn-primary" onclick="openNewBeerModal()">+ Crear primera receta</button></div>`;
+  } else {
+    grid.innerHTML = beers.map((b, i) => renderBeerCard(b, i)).join('');
+  }
+  const lab = document.getElementById('dashboard-lab');
+  const active = DB.beers.filter(b => b.status === 'fermenting' || b.status === 'aging');
+  if (!active.length) {
+    lab.innerHTML = `<div style="padding:16px;background:var(--bg3);border-radius:8px;border:1px solid var(--border2);text-align:center;color:var(--text4);font-size:13px;font-style:italic;">No hay fermentaciones activas.</div>`;
+  } else {
+    lab.innerHTML = active.map(b => `<div style="display:flex;align-items:center;gap:14px;padding:12px 16px;background:var(--bg3);border-radius:8px;border:1px solid var(--border2);border-left:3px solid ${b.status === 'fermenting' ? 'var(--brett2)' : 'var(--accent)'};">
+      <span class="status-dot ${b.status}" style="flex-shrink:0;"></span>
+      <div style="flex:1;"><div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text);">${b.name}</div><div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text4);margin-top:2px;">${b.style || ''}${b.batch ? ' · Lote ' + b.batch : ''}</div></div>
+      <div style="text-align:right;"><div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text3);text-transform:uppercase;">${statusLabel(b.status)}</div>${b.process?.vessel ? `<div style="font-size:11px;color:var(--text4);margin-top:2px;">${b.process.vessel}</div>` : ''}</div>
+    </div>`).join('');
+  }
+}
+
+function renderCatalog() {
+  const grid = document.getElementById('catalog-grid');
+  const search = (document.getElementById('search-input')?.value || '').toLowerCase();
+  const filterStyle = document.getElementById('filter-style')?.value || '';
+  const filterStatus = document.getElementById('filter-status')?.value || '';
+  let beers = DB.beers.filter(b => {
+    if (search && !b.name.toLowerCase().includes(search) && !(b.style || '').toLowerCase().includes(search)) return false;
+    if (filterStyle && b.style !== filterStyle) return false;
+    if (filterStatus && b.status !== filterStatus) return false;
+    return true;
+  });
+  if (!beers.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🔍</div><div class="empty-state-title">Sin resultados</div><button class="btn btn-primary" onclick="openNewBeerModal()">+ Nueva receta</button></div>`;
+    return;
+  }
+  grid.innerHTML = beers.map(b => renderBeerCard(b, DB.beers.indexOf(b))).join('');
+}
+
+// ========== BEER DETAIL ==========
+function openBeerDetail(index) {
+  currentBeerIndex = index;
+  const beer = DB.beers[index];
+  const hasBrett = beer.yeasts && beer.yeasts.some(y => y.type === 'Brettanomyces' || y.type === 'Mezcla salvaje');
+  const srmColor = beer.srm ? srmToColor(parseInt(beer.srm)) : '';
+  const stars = '★'.repeat(beer.tasting?.rating || 0) + '☆'.repeat(5 - (beer.tasting?.rating || 0));
+  document.getElementById('detail-body').innerHTML = `
+    <div class="detail-header">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+        ${beer.photo ? `<img src="${beer.photo}" class="detail-label-img" alt="${beer.name}">` : `<div class="detail-label-placeholder"><span>🍺</span><span style="font-family:'Space Mono',monospace;font-size:9px;color:var(--text4);">Sin etiqueta</span></div>`}
+      </div>
+      <div>
+        <div class="detail-style-tag">${hasBrett ? '🦠 ' : ''}${beer.style || 'Wild Ale'}</div>
+        <div class="detail-name">${beer.name}</div>
+        <div class="detail-vintage">${beer.date ? new Date(beer.date).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) : '—'}${beer.batch ? ' · Lote ' + beer.batch : ''} &nbsp; <span class="status-dot ${beer.status}" style="vertical-align:middle;"></span>${statusLabel(beer.status)}</div>
+        ${beer.desc ? `<div class="detail-desc">"${beer.desc}"</div>` : ''}
+        <div class="detail-stats-row">
+          <div class="detail-stat"><div class="val">${beer.abv || '—'}%</div><div class="lbl">ABV</div></div>
+          <div class="detail-stat"><div class="val">${beer.og || '—'}</div><div class="lbl">OG</div></div>
+          <div class="detail-stat"><div class="val">${beer.fg || '—'}</div><div class="lbl">FG</div></div>
+          <div class="detail-stat"><div class="val">${beer.ibu || '—'}</div><div class="lbl">IBU</div></div>
+          <div class="detail-stat"><div class="val" style="color:${srmColor || 'var(--accent2)'};">${beer.srm || '—'}</div><div class="lbl">SRM</div></div>
+          <div class="detail-stat"><div class="val">${beer.volume || '—'}L</div><div class="lbl">Vol.</div></div>
+        </div>
+        <div style="margin-top:10px;font-size:18px;color:var(--accent2);">${stars}</div>
+      </div>
+    </div>
+    <div class="detail-tabs">
+      <button class="detail-tab active" onclick="switchTab(this,'dtab-ing')">🌾 Ingredientes</button>
+      <button class="detail-tab" onclick="switchTab(this,'dtab-proc')">⚗️ Proceso</button>
+      <button class="detail-tab" onclick="switchTab(this,'dtab-cata')">👃 Cata</button>
+    </div>
+    <div id="dtab-ing" class="tab-content active">${renderMaltsDetail(beer.malts)}${renderHopsDetail(beer.hops)}${renderYeastsDetail(beer.yeasts)}${renderOthersDetail(beer.others)}</div>
+    <div id="dtab-proc" class="tab-content">${renderProcessDetail(beer.process)}</div>
+    <div id="dtab-cata" class="tab-content">${renderTastingDetail(beer.tasting)}</div>`;
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+function switchTab(btn, tabId) {
+  const body = btn.closest('.modal-body');
+  body.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+  body.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+
+function renderMaltsDetail(malts) {
+  if (!malts?.length) return '';
+  return `<div class="ing-section"><div class="ing-section-title">🌾 Maltas &amp; Adjuntos</div><div class="ing-list">${malts.map(m => `<div class="ing-item"><span class="ing-name">${m.name || '—'}</span><span class="ing-amount">${m.kg ? m.kg + ' kg' : ''}</span><span class="ing-detail">${m.lovibond ? m.lovibond + '°L' : ''} ${m.pct ? '· ' + m.pct + '%' : ''}</span></div>`).join('')}</div></div>`;
+}
+function renderHopsDetail(hops) {
+  if (!hops?.length) return '';
+  return `<div class="ing-section"><div class="ing-section-title">🌿 Lúpulos</div><div class="ing-list">${hops.map(h => `<div class="ing-item"><span class="ing-name">${h.variety || '—'}</span><span class="ing-amount">${h.grams ? h.grams + 'g' : ''}</span><span class="ing-detail">${h.aa ? h.aa + '% AA' : ''} ${h.timing ? '· ' + h.timing : ''} ${h.form ? '· ' + h.form : ''}</span></div>`).join('')}</div></div>`;
+}
+function renderYeastsDetail(yeasts) {
+  if (!yeasts?.length) return '';
+  return `<div class="ing-section"><div class="ing-section-title" style="color:var(--brett2);">🦠 Levaduras &amp; Bacterias</div><div class="ing-list">${yeasts.map(y => `<div class="ing-item ${y.type === 'Brettanomyces' || y.type === 'Mezcla salvaje' ? 'brett-yeast' : ''}"><span class="ing-name">${y.name || '—'}</span><span class="ing-amount" style="color:${y.type === 'Brettanomyces' || y.type === 'Mezcla salvaje' ? 'var(--brett2)' : 'var(--accent)'};">${y.type || ''}</span><span class="ing-detail">${y.lab ? y.lab : ''} ${y.stage ? '· ' + y.stage : ''} ${y.attenuation ? '· ' + y.attenuation + '% aten.' : ''}</span></div>`).join('')}</div></div>`;
+}
+function renderOthersDetail(others) {
+  if (!others?.length) return '';
+  return `<div class="ing-section"><div class="ing-section-title">🍊 Otros Ingredientes</div><div class="ing-list">${others.map(o => `<div class="ing-item"><span class="ing-name">${o.ingredient || '—'}</span><span class="ing-amount">${o.amount ? o.amount + ' ' + (o.unit || '') : ''}</span><span class="ing-detail">${o.timing || ''}</span></div>`).join('')}</div></div>`;
+}
+function renderProcessDetail(proc) {
+  if (!proc) return `<div style="color:var(--text4);font-style:italic;padding:20px;">Sin datos de proceso.</div>`;
+  return `<div class="timeline">
+    ${proc.mashTemp || proc.mashTime ? `<div class="timeline-step"><div class="timeline-title">Maceración</div><div class="timeline-content">${proc.mashTemp ? 'Temperatura: ' + proc.mashTemp + '°C' : ''}${proc.mashTime ? ' — ' + proc.mashTime + ' min' : ''}</div></div>` : ''}
+    ${proc.fermTemp || proc.fermTime ? `<div class="timeline-step"><div class="timeline-title">Fermentación Primaria</div><div class="timeline-content">${proc.fermTemp ? proc.fermTemp + '°C' : ''}${proc.fermTime ? ' — ' + proc.fermTime + ' días' : ''}</div></div>` : ''}
+    ${proc.brettTemp || proc.agingTime ? `<div class="timeline-step brett"><div class="timeline-title">Brett / Añejamiento</div><div class="timeline-content">${proc.brettTemp ? proc.brettTemp + '°C brett' : ''}${proc.agingTime ? ' — ' + proc.agingTime + ' meses' : ''}${proc.vessel ? '<br>' + proc.vessel : ''}</div></div>` : ''}
+    ${proc.notes ? `<div class="timeline-step"><div class="timeline-title">Notas</div><div class="timeline-content" style="white-space:pre-line;">${proc.notes}</div></div>` : ''}
+  </div>`;
+}
+function renderTastingDetail(tasting) {
+  if (!tasting) return `<div style="color:var(--text4);font-style:italic;padding:20px;">Sin notas de cata.</div>`;
+  const stars = '★'.repeat(tasting.rating || 0) + '☆'.repeat(5 - (tasting.rating || 0));
+  return `<div style="margin-bottom:14px;"><div style="font-size:22px;color:var(--accent2);">${stars}</div><div style="font-size:11px;color:var(--text4);font-family:'Space Mono',monospace;letter-spacing:2px;">VALORACIÓN PERSONAL</div></div>
+    ${tasting.nose ? `<div class="ing-section"><div class="ing-section-title">👃 Nariz</div><div style="background:var(--bg3);border-radius:6px;padding:12px;font-size:15px;color:var(--text2);line-height:1.7;border:1px solid var(--border2);">${tasting.nose}</div></div>` : ''}
+    ${tasting.palate ? `<div class="ing-section"><div class="ing-section-title">👅 Boca</div><div style="background:var(--bg3);border-radius:6px;padding:12px;font-size:15px;color:var(--text2);line-height:1.7;border:1px solid var(--border2);">${tasting.palate}</div></div>` : ''}
+    ${tasting.brett ? `<div class="ing-section"><div class="ing-section-title" style="color:var(--brett2);">🦠 Perfil Brett</div><div style="background:rgba(107,140,66,.06);border-radius:6px;padding:12px;font-size:15px;color:var(--text2);line-height:1.7;border:1px solid var(--brett3);">${tasting.brett}</div></div>` : ''}`;
+}
+
+function editCurrentBeer() {
+  if (currentBeerIndex === null) return;
+  const idx = currentBeerIndex;
+  // Close detail without resetting index via closeDetailModal (which nullifies currentBeerIndex)
+  document.getElementById('detail-modal').classList.remove('open');
+  currentBeerIndex = null;
+  loadBeerIntoForm(idx);
+  document.getElementById('modal-title-text').textContent = 'Editar Receta';
+  document.getElementById('beer-modal').classList.add('open');
+}
+
+// Edit directly from card (no need to open detail first)
+function editBeerDirectly(index) {
+  loadBeerIntoForm(index);
+  document.getElementById('modal-title-text').textContent = 'Editar Receta';
+  document.getElementById('beer-modal').classList.add('open');
+}
+function deleteCurrentBeer() {
+  if (currentBeerIndex === null) return;
+  if (!confirm(`¿Eliminar "${DB.beers[currentBeerIndex].name}"?`)) return;
+  DB.beers.splice(currentBeerIndex, 1);
+  saveDB(); closeDetailModal(); renderCatalog();
+}
+
+function loadBeerIntoForm(index) {
+  editingBeerIndex = index;
+  const b = DB.beers[index];
+  document.getElementById('beer-name').value = b.name || '';
+  document.getElementById('beer-batch').value = b.batch || '';
+  document.getElementById('beer-og').value = b.og || '';
+  document.getElementById('beer-fg').value = b.fg || '';
+  document.getElementById('beer-abv').value = b.abv || '';
+  document.getElementById('beer-ibu').value = b.ibu || '';
+  document.getElementById('beer-srm').value = b.srm || '';
+  document.getElementById('beer-volume').value = b.volume || '';
+  document.getElementById('beer-desc').value = b.desc || '';
+  document.getElementById('beer-style').value = b.style || 'Brett Saison';
+  document.getElementById('beer-status').value = b.status || 'concept';
+  document.getElementById('beer-date').value = b.date || '';
+  document.getElementById('proc-mash-temp').value = b.process?.mashTemp || '';
+  document.getElementById('proc-mash-time').value = b.process?.mashTime || '';
+  document.getElementById('proc-ferm-temp').value = b.process?.fermTemp || '';
+  document.getElementById('proc-ferm-time').value = b.process?.fermTime || '';
+  document.getElementById('proc-brett-temp').value = b.process?.brettTemp || '';
+  document.getElementById('proc-aging-time').value = b.process?.agingTime || '';
+  document.getElementById('proc-vessel').value = b.process?.vessel || 'Fermentador plástico (PET)';
+  document.getElementById('proc-notes').value = b.process?.notes || '';
+  document.getElementById('taste-nose').value = b.tasting?.nose || '';
+  document.getElementById('taste-palate').value = b.tasting?.palate || '';
+  document.getElementById('taste-brett').value = b.tasting?.brett || '';
+  currentRating = b.tasting?.rating || 0; setRating(currentRating);
+  currentPhotos.label = b.photo || null;
+  if (currentPhotos.label) { document.getElementById('label-preview').src = currentPhotos.label; document.getElementById('label-preview-container').style.display = 'block'; }
+  else document.getElementById('label-preview-container').style.display = 'none';
+
+  const selOpts = (opts, val) => opts.map(o => `<option${o === val ? ' selected' : ''}>${o}</option>`).join('');
+  const timingOpts = ['60 min','30 min','15 min','0 min (FO)','Dry Hop','Maceración'];
+  const formOpts = ['Pellet','Hoja','Lupulina'];
+  const typeOpts = ['Brettanomyces','Saccharomyces','Lactobacillus','Pediococcus','Acetobacter','Mezcla salvaje'];
+  const stageOpts = ['Primaria','Secundaria','Co-inoculación','Botella','Barrica'];
+
+  if (b.malts?.length) document.getElementById('malts-body').innerHTML = b.malts.map(m => `<tr><td><input type="text" value="${m.name||''}"></td><td><input type="number" value="${m.kg||''}" step="0.1" style="width:65px;"></td><td><input type="number" value="${m.lovibond||''}" style="width:60px;"></td><td><input type="number" value="${m.pct||''}" style="width:55px;"></td><td><button class="btn btn-danger" style="padding:3px 7px;" onclick="removeRow(this)">×</button></td></tr>`).join('');
+  if (b.hops?.length) document.getElementById('hops-body').innerHTML = b.hops.map(h => `<tr><td><input type="text" value="${h.variety||''}"></td><td><input type="number" value="${h.grams||''}" style="width:65px;"></td><td><input type="number" value="${h.aa||''}" step="0.1" style="width:55px;"></td><td><select style="font-size:12px;padding:4px;">${selOpts(timingOpts, h.timing)}</select></td><td><select style="font-size:12px;padding:4px;">${selOpts(formOpts, h.form)}</select></td><td><button class="btn btn-danger" style="padding:3px 7px;" onclick="removeRow(this)">×</button></td></tr>`).join('');
+  if (b.yeasts?.length) document.getElementById('yeasts-body').innerHTML = b.yeasts.map(y => `<tr style="background:rgba(107,140,66,.05);"><td><input type="text" value="${y.name||''}"></td><td><select style="font-size:12px;padding:4px;">${selOpts(typeOpts, y.type)}</select></td><td><input type="text" value="${y.lab||''}"></td><td><select style="font-size:12px;padding:4px;">${selOpts(stageOpts, y.stage)}</select></td><td><input type="number" value="${y.attenuation||''}" style="width:55px;"></td><td><button class="btn btn-danger" style="padding:3px 7px;" onclick="removeRow(this)">×</button></td></tr>`).join('');
+  if (b.others?.length) document.getElementById('others-body').innerHTML = b.others.map(o => `<tr><td><input type="text" value="${o.ingredient||''}"></td><td><input type="number" value="${o.amount||''}" style="width:75px;"></td><td><select style="font-size:12px;padding:4px;">${selOpts(['g','kg','ml','L','unidades'], o.unit)}</select></td><td><select style="font-size:12px;padding:4px;">${selOpts(['Hervor','Maceración','Fermentación','Secundaria','Botella'], o.timing)}</select></td><td><button class="btn btn-danger" style="padding:3px 7px;" onclick="removeRow(this)">×</button></td></tr>`).join('');
+}
+
+// ========== BODEGA ==========
+function openCellarModal(editIndex) {
+  editingCellarIndex = (editIndex !== undefined) ? editIndex : null;
+  currentPhotos.cellar = null;
+  ['cellar-name','cellar-style','cellar-notes','cellar-abv'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('cellar-bottle-type').value = '0.75';
+  document.getElementById('cellar-stock').value = '';
+  document.getElementById('cellar-vintage').value = new Date().toISOString().split('T')[0];
+  document.getElementById('cellar-photo-preview').src = '';
+  document.getElementById('cellar-photo-container').style.display = 'none';
+  document.getElementById('cellar-modal-title').textContent = 'Nueva Referencia de Bodega';
+  if (editingCellarIndex !== null) {
+    const c = DB.cellar[editingCellarIndex];
+    document.getElementById('cellar-name').value = c.name || '';
+    document.getElementById('cellar-style').value = c.style || '';
+    document.getElementById('cellar-vintage').value = c.vintage || '';
+    document.getElementById('cellar-bottle-type').value = c.bottleType || '0.75';
+    document.getElementById('cellar-stock').value = c.currentStock || '';
+    document.getElementById('cellar-abv').value = c.abv || '';
+    document.getElementById('cellar-notes').value = c.notes || '';
+    currentPhotos.cellar = c.photo || null;
+    if (currentPhotos.cellar) { document.getElementById('cellar-photo-preview').src = currentPhotos.cellar; document.getElementById('cellar-photo-container').style.display = 'block'; }
+    document.getElementById('cellar-modal-title').textContent = 'Editar Referencia';
+  }
+  document.getElementById('cellar-modal').classList.add('open');
+}
+function closeCellarModal() { document.getElementById('cellar-modal').classList.remove('open'); }
+
+function saveCellarEntry() {
+  const name = document.getElementById('cellar-name').value.trim();
+  if (!name) { alert('Por favor añade un nombre.'); return; }
+  const stock = parseInt(document.getElementById('cellar-stock').value) || 0;
+  const bottleType = parseFloat(document.getElementById('cellar-bottle-type').value) || 0.75;
+  const entry = {
+    id: editingCellarIndex !== null ? DB.cellar[editingCellarIndex].id : Date.now(),
+    name, style: document.getElementById('cellar-style').value,
+    vintage: document.getElementById('cellar-vintage').value,
+    bottleType: bottleType,
+    initialStock: editingCellarIndex !== null ? (DB.cellar[editingCellarIndex].initialStock || stock) : stock,
+    currentStock: stock,
+    abv: document.getElementById('cellar-abv').value,
+    notes: document.getElementById('cellar-notes').value,
+    photo: currentPhotos.cellar,
+    transactions: editingCellarIndex !== null ? DB.cellar[editingCellarIndex].transactions : [],
+    createdAt: editingCellarIndex !== null ? DB.cellar[editingCellarIndex].createdAt : new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  if (editingCellarIndex !== null) DB.cellar[editingCellarIndex] = entry; else DB.cellar.unshift(entry);
+  saveDB(); closeCellarModal(); renderCellar(); updateCellarSummary();
+}
+
+function renderCellar() {
+  const grid = document.getElementById('cellar-grid');
+  if (!DB.cellar.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🍾</div><div class="empty-state-title">Bodega vacía</div><button class="btn btn-cellar" onclick="openCellarModal()">+ Añadir referencia</button></div>`;
+    return;
+  }
+  grid.innerHTML = DB.cellar.map((c, i) => {
+    const bottleSize = parseFloat(c.bottleType) || 0.75;
+    const stock = parseInt(c.currentStock) || 0;
+    const liters = (stock * bottleSize).toFixed(2);
+    const initStock = parseInt(c.initialStock) || stock;
+    const pct = initStock > 0 ? Math.round((stock / initStock) * 100) : (stock > 0 ? 100 : 0);
+    const fillClass = pct <= 0 ? 'empty' : pct <= 25 ? 'low' : '';
+    const btLabel = { '0.33': '33cl', '0.375': '37,5cl', '0.5': '50cl', '0.75': '75cl', '1.5': 'Magnum' }[String(bottleSize)] || bottleSize + 'L';
+    return `<div class="cellar-card" onclick="openCellarDetail(${i})">
+      <div class="cellar-card-img">
+        ${c.photo ? `<img src="${c.photo}" alt="${c.name}">` : `<div class="cellar-card-img-placeholder"><span>🍾</span><span style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text4);">${btLabel}</span></div>`}
+        <div class="cellar-bottle-badge">${btLabel}</div>
+      </div>
+      <div class="cellar-card-body">
+        <div class="cellar-card-name">${c.name}</div>
+        <div class="cellar-card-ref">${c.style || ''}${c.vintage ? ' · ' + new Date(c.vintage).getFullYear() : ''}</div>
+        <div style="display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:10px;color:var(--text4);margin-bottom:4px;"><span>Stock</span><span style="color:${fillClass === 'empty' ? 'var(--red)' : fillClass === 'low' ? 'var(--accent)' : 'var(--blue2)'};">${stock} bot.</span></div>
+        <div class="stock-bar"><div class="stock-fill ${fillClass}" style="width:${Math.min(pct, 100)}%;"></div></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px;">
+          <div><span class="cellar-liters-big">${liters}L</span></div>
+          <div class="cellar-liters-sub">${initStock > 0 && pct !== 100 ? pct + '% restante' : ''}</div>
+        </div>
+      </div>
+      <div class="cellar-card-footer">
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-cellar btn-sm" style="font-size:9px;padding:4px 10px;" onclick="event.stopPropagation();currentCellarIndex=${i};openDeductModal()">− Sacar</button>
+          <button class="btn-edit-card" onclick="event.stopPropagation();editCellarDirect(${i})">✏️ Editar</button>
+        </div>
+        <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text4);">${c.abv ? c.abv + '% ABV' : ''}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateCellarSummary() {
+  document.getElementById('cs-refs').textContent = DB.cellar.length;
+  document.getElementById('cs-bottles').textContent = DB.cellar.reduce((s, c) => s + (parseInt(c.currentStock) || 0), 0);
+  document.getElementById('cs-liters').textContent = DB.cellar.reduce((s, c) => s + (parseInt(c.currentStock) || 0) * (parseFloat(c.bottleType) || 0.75), 0).toFixed(1) + 'L';
+}
+
+function editCellarDirect(index) {
+  openCellarModal(index);
+}
+
+function openCellarDetail(index) {
+  currentCellarIndex = index;
+  const c = DB.cellar[index];
+  const liters = (c.currentStock * c.bottleType).toFixed(2);
+  const btLabel = { '0.33': '33cl', '0.375': '37,5cl', '0.5': '50cl', '0.75': '75cl', '1.5': 'Magnum' }[String(c.bottleType)] || c.bottleType + 'L';
+  document.getElementById('cd-title').textContent = c.name;
+  const txs = c.transactions || [];
+  document.getElementById('cellar-detail-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:24px;margin-bottom:22px;align-items:start;">
+      <div style="text-align:center;">
+        ${c.photo ? `<img src="${c.photo}" style="max-width:150px;max-height:230px;object-fit:contain;border-radius:8px;border:1px solid var(--border);box-shadow:0 6px 24px rgba(0,0,0,.5);">` : `<div style="width:130px;height:175px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--text4);font-size:38px;">🍾<span style="font-family:'Space Mono',monospace;font-size:9px;">${btLabel}</span></div>`}
+      </div>
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--blue2);letter-spacing:2px;margin-bottom:6px;">${c.style || ''}${c.vintage ? ' · ' + new Date(c.vintage).toLocaleDateString('es-ES', { year: 'numeric', month: 'long' }) : ''}</div>
+        <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:var(--text);margin-bottom:10px;">${c.name}</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+          <div class="detail-stat"><div class="val" style="color:var(--blue2);">${c.currentStock}</div><div class="lbl">Botellas</div></div>
+          <div class="detail-stat"><div class="val" style="color:var(--blue2);">${liters}L</div><div class="lbl">Litros</div></div>
+          <div class="detail-stat"><div class="val">${c.abv || '—'}%</div><div class="lbl">ABV</div></div>
+          <div class="detail-stat"><div class="val" style="font-size:16px;color:var(--text3);">${btLabel}</div><div class="lbl">Formato</div></div>
+        </div>
+        ${c.notes ? `<div style="background:var(--bg3);border-radius:6px;padding:12px;font-size:14px;color:var(--text2);line-height:1.7;border:1px solid var(--border2);">${c.notes}</div>` : ''}
+      </div>
+    </div>
+    <div>
+      <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--accent2);margin-bottom:12px;">📦 Historial de movimientos</div>
+      ${txs.length ? `<div class="tx-list">${txs.slice().reverse().map(t => `<div class="tx-item ${t.qty < 0 ? 'out' : 'in'}"><div class="tx-qty ${t.qty < 0 ? 'out' : 'in'}">${t.qty > 0 ? '+' : ''}${t.qty}</div><div style="flex:1;"><div style="font-size:13px;color:var(--text2);">${t.note || 'Sin nota'}</div><div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--text4);margin-top:2px;">${t.date || '—'}</div></div></div>`).join('')}</div>` : `<div style="color:var(--text4);font-style:italic;font-size:13px;">Sin movimientos registrados.</div>`}
+    </div>`;
+  document.getElementById('cellar-detail-modal').classList.add('open');
+}
+
+function openDeductModal() {
+  if (currentCellarIndex === null) return;
+  const c = DB.cellar[currentCellarIndex];
+  document.getElementById('deduct-ref-name').textContent = c.name;
+  document.getElementById('deduct-current-stock').textContent = c.currentStock;
+  document.getElementById('deduct-qty').value = 1;
+  document.getElementById('deduct-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('deduct-note').value = '';
+  document.getElementById('cellar-deduct-modal').classList.add('open');
+}
+
+function executeDeduct() {
+  const qty = parseInt(document.getElementById('deduct-qty').value) || 0;
+  if (qty <= 0) { alert('Cantidad inválida.'); return; }
+  const c = DB.cellar[currentCellarIndex];
+  if (qty > c.currentStock) { alert(`Solo quedan ${c.currentStock} botellas.`); return; }
+  c.currentStock -= qty;
+  c.transactions.push({ qty: -qty, date: document.getElementById('deduct-date').value, note: document.getElementById('deduct-note').value, ts: Date.now() });
+  c.updatedAt = new Date().toISOString();
+  saveDB();
+  document.getElementById('cellar-deduct-modal').classList.remove('open');
+  openCellarDetail(currentCellarIndex);
+  renderCellar(); updateCellarSummary();
+}
+
+function editCellarEntry() {
+  document.getElementById('cellar-detail-modal').classList.remove('open');
+  openCellarModal(currentCellarIndex);
+}
+function deleteCellarEntry() {
+  if (!confirm(`¿Eliminar "${DB.cellar[currentCellarIndex].name}" de la bodega?`)) return;
+  DB.cellar.splice(currentCellarIndex, 1);
+  saveDB();
+  document.getElementById('cellar-detail-modal').classList.remove('open');
+  renderCellar(); updateCellarSummary();
+}
+
+// ========== CATAS BJCP ==========
+function getBJCPRank(score) {
+  if (score >= 47) return { label: 'OUTSTANDING — Excepcional', color: 'var(--accent2)', cls: 'outstanding' };
+  if (score >= 40) return { label: 'EXCELLENT — Excelente', color: 'var(--brett2)', cls: 'excellent' };
+  if (score >= 30) return { label: 'VERY GOOD — Muy Buena', color: '#4aa280', cls: 'verygood' };
+  if (score >= 21) return { label: 'GOOD — Buena', color: 'var(--blue2)', cls: 'good' };
+  if (score >= 14) return { label: 'FAIR — Aceptable', color: 'var(--accent3)', cls: 'fair' };
+  return { label: 'PROBLEMATIC — Con problemas', color: 'var(--red)', cls: 'problematic' };
+}
+
+function updateBJCPTotal() {
+  const a = Math.min(parseInt(document.getElementById('score-aroma')?.value) || 0, 12);
+  const ap = Math.min(parseInt(document.getElementById('score-appearance')?.value) || 0, 3);
+  const f = Math.min(parseInt(document.getElementById('score-flavor')?.value) || 0, 20);
+  const m = Math.min(parseInt(document.getElementById('score-mouthfeel')?.value) || 0, 5);
+  const o = Math.min(parseInt(document.getElementById('score-overall')?.value) || 0, 10);
+  const total = a + ap + f + m + o;
+  document.getElementById('bjcp-total-display').textContent = total;
+  const rank = getBJCPRank(total);
+  const el = document.getElementById('bjcp-rank-display');
+  el.textContent = rank.label;
+  el.style.color = rank.color;
+}
+
+function openCataModal(editIndex) {
+  editingCataIndex = (editIndex !== undefined) ? editIndex : null;
+  currentPhotos.cata = null;
+  ['cata-beer-name','cata-vintage','cata-glass','aroma-malt','aroma-hops','aroma-ferm','aroma-brett',
+   'app-color','app-head','flavor-malt','flavor-hops','flavor-ferm','flavor-brett','flavor-finish',
+   'mf-notes','overall-notes','overall-faults'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['score-aroma','score-appearance','score-flavor','score-mouthfeel','score-overall'].forEach(id => { const el = document.getElementById(id); if (el) el.value = 0; });
+  document.getElementById('cata-style').value = '28A. Brett Beer';
+  document.getElementById('cata-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('cata-temp').value = '';
+  document.getElementById('cata-aging-months').value = '';
+  document.getElementById('cata-photo-preview').src = '';
+  document.getElementById('cata-photo-container').style.display = 'none';
+  document.getElementById('cata-modal-title').textContent = 'Nueva Cata BJCP';
+  // Populate cellar refs
+  const sel = document.getElementById('cata-cellar-ref');
+  sel.innerHTML = '<option value="">— Sin referencia de bodega —</option>' + DB.cellar.map((c, i) => `<option value="${i}">${c.name}</option>`).join('');
+  if (editingCataIndex !== null) {
+    const t = DB.tastings[editingCataIndex];
+    document.getElementById('cata-beer-name').value = t.beerName || '';
+    document.getElementById('cata-style').value = t.style || '28A. Brett Beer';
+    document.getElementById('cata-date').value = t.date || '';
+    document.getElementById('cata-vintage').value = t.vintage || '';
+    document.getElementById('cata-temp').value = t.servingTemp || '';
+    document.getElementById('cata-glass').value = t.glassware || '';
+    document.getElementById('cata-aging-months').value = t.agingMonths || '';
+    if (t.cellarRef !== null && t.cellarRef !== undefined) document.getElementById('cata-cellar-ref').value = t.cellarRef;
+    document.getElementById('score-aroma').value = t.scores?.aroma || 0;
+    document.getElementById('score-appearance').value = t.scores?.appearance || 0;
+    document.getElementById('score-flavor').value = t.scores?.flavor || 0;
+    document.getElementById('score-mouthfeel').value = t.scores?.mouthfeel || 0;
+    document.getElementById('score-overall').value = t.scores?.overall || 0;
+    document.getElementById('aroma-malt').value = t.aroma?.malt || '';
+    document.getElementById('aroma-hops').value = t.aroma?.hops || '';
+    document.getElementById('aroma-ferm').value = t.aroma?.ferm || '';
+    document.getElementById('aroma-brett').value = t.aroma?.brett || '';
+    document.getElementById('app-color').value = t.appearance?.color || '';
+    document.getElementById('app-clarity').value = t.appearance?.clarity || 'Brillante';
+    document.getElementById('app-head').value = t.appearance?.head || '';
+    document.getElementById('app-carbonation').value = t.appearance?.carbonation || 'Sin observar';
+    document.getElementById('flavor-malt').value = t.flavor?.malt || '';
+    document.getElementById('flavor-hops').value = t.flavor?.hops || '';
+    document.getElementById('flavor-ferm').value = t.flavor?.ferm || '';
+    document.getElementById('flavor-brett').value = t.flavor?.brett || '';
+    document.getElementById('flavor-acidity').value = t.flavor?.acidity || 'Sin acidez';
+    document.getElementById('flavor-finish').value = t.flavor?.finish || '';
+    document.getElementById('mf-body').value = t.mouthfeel?.body || 'Ligero';
+    document.getElementById('mf-carb').value = t.mouthfeel?.carb || 'Media';
+    document.getElementById('mf-warmth').value = t.mouthfeel?.warmth || 'Sin notar';
+    document.getElementById('mf-astringency').value = t.mouthfeel?.astringency || 'Sin astringencia';
+    document.getElementById('mf-notes').value = t.mouthfeel?.notes || '';
+    document.getElementById('overall-notes').value = t.overall?.notes || '';
+    document.getElementById('overall-faults').value = t.overall?.faults || '';
+    document.getElementById('overall-aging').value = t.overall?.aging || 'Beber ahora';
+    currentPhotos.cata = t.photo || null;
+    if (currentPhotos.cata) { document.getElementById('cata-photo-preview').src = currentPhotos.cata; document.getElementById('cata-photo-container').style.display = 'block'; }
+    document.getElementById('cata-modal-title').textContent = 'Editar Cata';
+  }
+  updateBJCPTotal();
+  document.getElementById('cata-modal').classList.add('open');
+}
+function closeCataModal() { document.getElementById('cata-modal').classList.remove('open'); }
+
+function saveCata() {
+  const name = document.getElementById('cata-beer-name').value.trim();
+  if (!name) { alert('Por favor, añade el nombre de la cerveza catada.'); return; }
+  const a = Math.min(parseInt(document.getElementById('score-aroma').value) || 0, 12);
+  const ap = Math.min(parseInt(document.getElementById('score-appearance').value) || 0, 3);
+  const f = Math.min(parseInt(document.getElementById('score-flavor').value) || 0, 20);
+  const m = Math.min(parseInt(document.getElementById('score-mouthfeel').value) || 0, 5);
+  const o = Math.min(parseInt(document.getElementById('score-overall').value) || 0, 10);
+  const total = a + ap + f + m + o;
+  const cellarRefVal = document.getElementById('cata-cellar-ref').value;
+  const tasting = {
+    id: editingCataIndex !== null ? DB.tastings[editingCataIndex].id : Date.now(),
+    beerName: name, style: document.getElementById('cata-style').value,
+    date: document.getElementById('cata-date').value, vintage: document.getElementById('cata-vintage').value,
+    servingTemp: document.getElementById('cata-temp').value, glassware: document.getElementById('cata-glass').value,
+    cellarRef: cellarRefVal !== '' ? parseInt(cellarRefVal) : null,
+    agingMonths: document.getElementById('cata-aging-months').value,
+    photo: currentPhotos.cata,
+    scores: { aroma: a, appearance: ap, flavor: f, mouthfeel: m, overall: o, total },
+    aroma: { malt: document.getElementById('aroma-malt').value, hops: document.getElementById('aroma-hops').value, ferm: document.getElementById('aroma-ferm').value, brett: document.getElementById('aroma-brett').value },
+    appearance: { color: document.getElementById('app-color').value, clarity: document.getElementById('app-clarity').value, head: document.getElementById('app-head').value, carbonation: document.getElementById('app-carbonation').value },
+    flavor: { malt: document.getElementById('flavor-malt').value, hops: document.getElementById('flavor-hops').value, ferm: document.getElementById('flavor-ferm').value, brett: document.getElementById('flavor-brett').value, acidity: document.getElementById('flavor-acidity').value, finish: document.getElementById('flavor-finish').value },
+    mouthfeel: { body: document.getElementById('mf-body').value, carb: document.getElementById('mf-carb').value, warmth: document.getElementById('mf-warmth').value, astringency: document.getElementById('mf-astringency').value, notes: document.getElementById('mf-notes').value },
+    overall: { notes: document.getElementById('overall-notes').value, faults: document.getElementById('overall-faults').value, aging: document.getElementById('overall-aging').value },
+    createdAt: editingCataIndex !== null ? DB.tastings[editingCataIndex].createdAt : new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  if (editingCataIndex !== null) DB.tastings[editingCataIndex] = tasting; else DB.tastings.unshift(tasting);
+  saveDB(); closeCataModal(); renderCatas();
+}
+
+function renderCatas() {
+  const grid = document.getElementById('catas-grid');
+  if (!DB.tastings.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">📋</div><div class="empty-state-title">Sin catas registradas</div><button class="btn btn-primary" onclick="openCataModal()">+ Nueva Cata</button></div>`;
+    return;
+  }
+  grid.innerHTML = DB.tastings.map((t, i) => {
+    const total = t.scores?.total || 0;
+    const rank = getBJCPRank(total);
+    const sc = t.scores || {};
+    return `<div class="tasting-card" onclick="openCataDetail(${i})">
+      <div class="tasting-card-header">
+        <div class="tasting-card-name">${t.beerName}</div>
+        <div class="tasting-card-meta">${t.style || ''}${t.date ? ' · ' + t.date : ''}${t.agingMonths ? ' · ' + t.agingMonths + 'm guarda' : ''}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 15px;">
+        ${t.photo ? `<img src="${t.photo}" style="width:55px;height:75px;object-fit:contain;border-radius:4px;border:1px solid var(--border2);background:var(--bg4);flex-shrink:0;">` : ''}
+        <div style="flex:1;">
+          <div><span class="bjcp-score-total">${total}</span><span class="bjcp-score-max"> / 50</span></div>
+          <span class="bjcp-rank-badge bjcp-rank-${rank.cls}">${rank.label.split('—')[0].trim()}</span>
+          <div class="score-mini-bars">
+            <div class="score-mini-bar"><span class="score-mini-label">Aroma</span><div class="score-mini-track"><div class="score-mini-fill" style="width:${(sc.aroma||0)/12*100}%"></div></div><span class="score-mini-num">${sc.aroma||0}</span></div>
+            <div class="score-mini-bar"><span class="score-mini-label">Sabor</span><div class="score-mini-track"><div class="score-mini-fill" style="width:${(sc.flavor||0)/20*100}%"></div></div><span class="score-mini-num">${sc.flavor||0}</span></div>
+            <div class="score-mini-bar"><span class="score-mini-label">General</span><div class="score-mini-track"><div class="score-mini-fill" style="width:${(sc.overall||0)/10*100}%"></div></div><span class="score-mini-num">${sc.overall||0}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openCataDetail(index) {
+  currentCataIndex = index;
+  const t = DB.tastings[index];
+  const total = t.scores?.total || 0;
+  const rank = getBJCPRank(total);
+  const sc = t.scores || {};
+  const cellarRef = (t.cellarRef !== null && t.cellarRef !== undefined) ? DB.cellar[t.cellarRef] : null;
+  const secRow = (label, val) => val ? `<div><div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--text4);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">${label}</div><div style="font-size:14px;color:var(--text2);line-height:1.6;">${val}</div></div>` : '';
+  document.getElementById('cata-detail-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:22px;margin-bottom:22px;align-items:start;">
+      <div style="text-align:center;">
+        ${t.photo ? `<img src="${t.photo}" style="max-width:130px;max-height:190px;object-fit:contain;border-radius:8px;border:1px solid var(--border);box-shadow:0 6px 20px rgba(0,0,0,.5);">` : '<div style="width:110px;height:150px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:38px;">📋</div>'}
+      </div>
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;">${t.style || ''}</div>
+        <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:var(--text);margin-bottom:5px;">${t.beerName}</div>
+        <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text4);margin-bottom:12px;">${t.date || ''}${t.vintage ? ' · ' + t.vintage : ''}${t.agingMonths ? ' · ' + t.agingMonths + ' meses guarda' : ''}</div>
+        <div class="bjcp-total-display" style="padding:14px;margin-bottom:10px;"><div class="bjcp-total-number">${total}</div><div class="bjcp-total-label">Puntos BJCP — de 50</div><div class="bjcp-rank-display" style="color:${rank.color};">${rank.label}</div></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          ${[['Aroma',sc.aroma||0,12],['Apariencia',sc.appearance||0,3],['Sabor',sc.flavor||0,20],['Boca',sc.mouthfeel||0,5],['General',sc.overall||0,10]].map(([l,v,mx])=>`<span style="font-family:'Space Mono',monospace;font-size:10px;background:var(--bg3);padding:4px 9px;border-radius:4px;border:1px solid var(--border2);color:var(--text3);">${l}: ${v}/${mx}</span>`).join('')}
+        </div>
+        ${cellarRef ? `<div style="margin-top:10px;background:rgba(58,106,140,.1);border:1px solid rgba(58,106,140,.3);border-radius:6px;padding:10px 14px;font-size:13px;color:var(--blue2);">🍾 Bodega: <strong>${cellarRef.name}</strong></div>` : ''}
+      </div>
+    </div>
+    <div class="bjcp-section" style="margin-bottom:12px;">
+      <div class="bjcp-section-header"><div class="bjcp-section-title">👃 Aroma</div><div class="bjcp-section-score"><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--accent2);">${sc.aroma||0}</span><span class="bjcp-score-max-label"> / 12</span></div></div>
+      <div class="bjcp-section-body" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">${secRow('Malta',t.aroma?.malt)}${secRow('Lúpulo',t.aroma?.hops)}${secRow('Fermentación',t.aroma?.ferm)}${secRow('Brett / Bacteria',t.aroma?.brett)}</div>
+    </div>
+    <div class="bjcp-section" style="margin-bottom:12px;">
+      <div class="bjcp-section-header"><div class="bjcp-section-title">👁️ Apariencia</div><div class="bjcp-section-score"><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--accent2);">${sc.appearance||0}</span><span class="bjcp-score-max-label"> / 3</span></div></div>
+      <div class="bjcp-section-body" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">${secRow('Color',t.appearance?.color)}${secRow('Claridad',t.appearance?.clarity)}${secRow('Espuma',t.appearance?.head)}${secRow('Carbonatación',t.appearance?.carbonation)}</div>
+    </div>
+    <div class="bjcp-section" style="margin-bottom:12px;">
+      <div class="bjcp-section-header"><div class="bjcp-section-title">👅 Sabor</div><div class="bjcp-section-score"><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--accent2);">${sc.flavor||0}</span><span class="bjcp-score-max-label"> / 20</span></div></div>
+      <div class="bjcp-section-body" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">${secRow('Malta',t.flavor?.malt)}${secRow('Lúpulo/Amargor',t.flavor?.hops)}${secRow('Fermentación',t.flavor?.ferm)}${secRow('Brett / Bacteria',t.flavor?.brett)}${secRow('Acidez',t.flavor?.acidity)}${secRow('Retrogusto',t.flavor?.finish)}</div>
+    </div>
+    <div class="bjcp-section" style="margin-bottom:12px;">
+      <div class="bjcp-section-header"><div class="bjcp-section-title">✋ Sensación en Boca</div><div class="bjcp-section-score"><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--accent2);">${sc.mouthfeel||0}</span><span class="bjcp-score-max-label"> / 5</span></div></div>
+      <div class="bjcp-section-body" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">${secRow('Cuerpo',t.mouthfeel?.body)}${secRow('Carbonatación',t.mouthfeel?.carb)}${secRow('Calidez',t.mouthfeel?.warmth)}${secRow('Astringencia',t.mouthfeel?.astringency)}${t.mouthfeel?.notes?`<div style="grid-column:1/-1;">${secRow('Notas',t.mouthfeel.notes)}</div>`:''}</div>
+    </div>
+    <div class="bjcp-section" style="margin-bottom:12px;">
+      <div class="bjcp-section-header"><div class="bjcp-section-title">⭐ Impresión General</div><div class="bjcp-section-score"><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--accent2);">${sc.overall||0}</span><span class="bjcp-score-max-label"> / 10</span></div></div>
+      <div class="bjcp-section-body">
+        ${t.overall?.notes ? `<div style="margin-bottom:12px;background:var(--bg4);border-radius:6px;padding:12px;font-size:14px;color:var(--text2);line-height:1.7;">${t.overall.notes}</div>` : ''}
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">${secRow('Defectos',t.overall?.faults)}${secRow('Potencial guarda',t.overall?.aging)}</div>
+      </div>
+    </div>
+    <div style="padding:12px 16px;background:var(--bg3);border-radius:6px;border:1px solid var(--border2);font-size:12px;color:var(--text4);">
+      ${t.servingTemp ? `<strong>Temp. servicio:</strong> ${t.servingTemp}°C &nbsp;&nbsp;` : ''}${t.glassware ? `<strong>Copa:</strong> ${t.glassware}` : ''}<br>
+      <em>Cata registrada: ${t.createdAt ? new Date(t.createdAt).toLocaleDateString('es-ES') : ''}</em>
+    </div>`;
+  document.getElementById('cata-detail-modal').classList.add('open');
+}
+
+function editCurrentCata() {
+  if (currentCataIndex === null) return;
+  document.getElementById('cata-detail-modal').classList.remove('open');
+  openCataModal(currentCataIndex);
+}
+function deleteCurrentCata() {
+  if (currentCataIndex === null || !confirm(`¿Eliminar esta cata de "${DB.tastings[currentCataIndex].beerName}"?`)) return;
+  DB.tastings.splice(currentCataIndex, 1);
+  saveDB();
+  document.getElementById('cata-detail-modal').classList.remove('open');
+  renderCatas();
+}
+
+// ========== CALCULADORAS ==========
+function calcABV() {
+  const og = parseFloat(document.getElementById('calc-og').value);
+  const fg = parseFloat(document.getElementById('calc-fg').value);
+  const method = document.getElementById('calc-method').value;
+  if (!og || !fg) return;
+  let abv, detail;
+  if (method === 'standard') { abv = (og - fg) * 131.25; detail = 'Fórmula estándar: (OG - FG) × 131.25'; }
+  else if (method === 'advanced') { abv = (76.08 * (og - fg) / (1.775 - og)) * (fg / 0.794); detail = 'Fórmula Noonan (más precisa para densidades altas)'; }
+  else { abv = ((og - fg) * 131.25) * 1.05; detail = 'Fórmula Brett (+5% por alta atenuación de dextrinas)'; }
+  const attenuation = ((og - fg) / (og - 1.000)) * 100;
+  document.getElementById('abv-result').innerHTML = `<div class="calc-result-value">${abv.toFixed(2)}%</div><div class="calc-result-label">% ABV</div>`;
+  document.getElementById('abv-detail').textContent = `${detail} — Atenuación: ${attenuation.toFixed(1)}%`;
+}
+
+function calcAttenuation() {
+  const og = parseFloat(document.getElementById('att-og').value);
+  const fg = parseFloat(document.getElementById('att-fg').value);
+  if (!og || !fg) return;
+  const apparent = ((og - fg) / (og - 1.000)) * 100;
+  const real = apparent * 0.819;
+  document.getElementById('att-apparent').textContent = apparent.toFixed(1) + '%';
+  document.getElementById('att-real').textContent = real.toFixed(1) + '%';
+  const bar = document.getElementById('att-bar');
+  bar.style.width = Math.min(apparent, 100) + '%';
+  bar.textContent = apparent.toFixed(0) + '%';
+  let interp = '';
+  if (apparent < 60) interp = '⚠️ Atenuación baja — brett puede seguir trabajando';
+  else if (apparent < 75) interp = 'Atenuación normal para Saccharomyces';
+  else if (apparent < 85) interp = '✓ Buena atenuación — perfil brett moderado';
+  else if (apparent < 95) interp = '🦠 Alta atenuación — brett muy activo';
+  else interp = '🦠 Atenuación extrema — brett dominante / solera';
+  document.getElementById('att-interpret').textContent = interp;
+}
+
+function calcIBU() {
+  const alpha = parseFloat(document.getElementById('ibu-alpha').value) / 100;
+  const amount = parseFloat(document.getElementById('ibu-amount').value);
+  const time = parseFloat(document.getElementById('ibu-time').value);
+  const volume = parseFloat(document.getElementById('ibu-volume').value);
+  const og = parseFloat(document.getElementById('ibu-og').value) || 1.050;
+  if (!alpha || !amount || !time || !volume) return;
+  const bignessFactor = 1.65 * Math.pow(0.000125, og - 1);
+  const boilTimeFactor = (1 - Math.exp(-0.04 * time)) / 4.15;
+  const ibu = (bignessFactor * boilTimeFactor * alpha * amount * 1000) / volume;
+  document.getElementById('ibu-result').innerHTML = `<div class="calc-result-value">${ibu.toFixed(1)}</div><div class="calc-result-label">IBU — Tinseth</div>`;
+  let style = '';
+  if (ibu < 10) style = '🌾 Casi sin amargor — ideal para lambic/gueuze';
+  else if (ibu < 20) style = '✓ Amargor bajo — brett saison, farmhouse';
+  else if (ibu < 35) style = '✓ Amargor equilibrado — wild ales, mixed ferm.';
+  else if (ibu < 50) style = '🌿 Amargor marcado — brett IPA';
+  else style = '🌿 Muy amargo — brett DIPA';
+  document.getElementById('ibu-style').textContent = style;
+}
+
+function calcSRM() {
+  let mcu = 0;
+  const vol = parseFloat(document.getElementById('srm-vol').value) || 20;
+  for (let i = 1; i <= 3; i++) {
+    const kg = parseFloat(document.getElementById(`srm-kg-${i}`)?.value) || 0;
+    const lov = parseFloat(document.getElementById(`srm-lov-${i}`)?.value) || 0;
+    if (kg && lov) mcu += (kg * 2.2046 * lov) / (vol * 0.264172);
+  }
+  if (!mcu) return;
+  const srm = 1.4922 * Math.pow(mcu, 0.6859);
+  const ebc = srm * 1.97;
+  const color = srmToColor(Math.round(srm));
+  const isLight = srm < 8;
+  document.getElementById('srm-display').style.background = color;
+  document.getElementById('srm-display').style.color = isLight ? '#000' : '#fff';
+  document.getElementById('srm-display').textContent = `SRM: ${srm.toFixed(1)}  |  EBC: ${ebc.toFixed(1)}`;
+  let label = '';
+  if (srm < 3) label = 'Muy pálida — Lager / Pilsen';
+  else if (srm < 6) label = 'Pálida dorada';
+  else if (srm < 9) label = 'Dorada — Saison / Farmhouse';
+  else if (srm < 14) label = 'Ámbar';
+  else if (srm < 18) label = 'Cobre — Oud Bruin / Flanders';
+  else if (srm < 26) label = 'Marrón';
+  else label = 'Oscura / Negra';
+  document.getElementById('srm-label').textContent = label;
+}
+
+function calcCarb() {
+  const vols = parseFloat(document.getElementById('carb-vols').value);
+  const temp = parseFloat(document.getElementById('carb-temp').value);
+  const vol = parseFloat(document.getElementById('carb-vol').value);
+  const factor = parseFloat(document.getElementById('carb-sugar').value);
+  if (!vols || !temp || !vol) return;
+  const co2Residual = -0.9753 * Math.log(temp) + 4.9648;
+  const co2Needed = vols - co2Residual;
+  const sugarNeeded = (co2Needed * vol * 1.95) / factor;
+  document.getElementById('carb-result').innerHTML = `<div class="calc-result-value">${Math.max(0, sugarNeeded).toFixed(1)}</div><div class="calc-result-label">Gramos para ${vol}L</div>`;
+  let warn = '';
+  if (vols > 3.5) warn = '⚠️ Carbonatación muy alta — usa botellas de champán (6+ bar).';
+  else if (vols > 3.0) warn = '🍾 Carbonatación brett saison — asegura FG estable antes de embotellar.';
+  else warn = '✓ Carbonatación estándar — adecuada para wild ales.';
+  document.getElementById('carb-warn').textContent = warn;
+}
+
+function calcPH() {
+  const target = parseFloat(document.getElementById('ph-target').value);
+  const profile = document.getElementById('ph-profile').value;
+  const time = document.getElementById('ph-time').value;
+  if (!target) { document.getElementById('ph-result').innerHTML = `<div style="font-size:13px;color:var(--text3);">Ingresa los parámetros.</div>`; return; }
+  const profileMap = {
+    brett: { name: 'Brett Limpio', oa: '10–20%', la: '80–90%', temp: '20–24°C' },
+    lacto: { name: 'Lactobacillus', oa: '0–5%', la: '95–100%', temp: '35–45°C' },
+    acetobacter: { name: 'Acetobacter', oa: '40–70%', la: '30–60%', temp: '22–28°C' },
+    complex: { name: 'Lambic / Complejo', oa: '15–30%', la: '60–85%', temp: 'variable' },
+  };
+  const p = profileMap[profile];
+  const timeMap = { short: '3–6 meses', medium: '6–18 meses', long: '18–36 meses', solera: 'indefinido' };
+  document.getElementById('ph-result').innerHTML = `<div style="font-size:13px;line-height:1.9;color:var(--text2);">
+    <strong style="color:var(--brett2);">Perfil:</strong> ${p.name}<br>
+    <strong style="color:var(--accent2);">pH objetivo:</strong> ${target}<br>
+    <strong>Ácido Láctico:</strong> ${p.la}<br>
+    <strong>Ácido Acético:</strong> ${p.oa}<br>
+    <strong>Temperatura:</strong> ${p.temp}<br>
+    <strong>Tiempo:</strong> ${timeMap[time]}<br>
+    ${target < 3.5 ? '<span style="color:var(--red);">⚠️ pH muy bajo — puede inhibir brett y Saccharomyces</span>' : ''}
+    ${target > 4.5 ? '<span style="color:var(--accent);">ℹ️ pH alto — mayor riesgo de infecciones no deseadas</span>' : ''}
+  </div>`;
+}
+
+// ========== DATA ==========
+function exportData() {
+  const json = JSON.stringify(DB, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `brett-lab-backup-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!imported.beers) { alert('Formato de archivo incorrecto.'); return; }
+      DB = imported;
+      if (!DB.cellar) DB.cellar = [];
+      if (!DB.tastings) DB.tastings = [];
+      saveDB(); renderCatalog(); renderCellar(); updateCellarSummary(); renderCatas();
+      document.getElementById('import-status').textContent = `✓ Importados: ${DB.beers.length} recetas, ${DB.cellar.length} bodega, ${DB.tastings.length} catas`;
+    } catch (err) { alert('Error al leer el archivo JSON.'); }
+  };
+  reader.readAsText(file);
+}
+function clearData() {
+  if (!confirm('¿Eliminar todos los datos? Esta acción no se puede deshacer.')) return;
+  DB = { beers: [], cellar: [], tastings: [] };
+  saveDB(); renderCatalog(); renderCellar(); updateCellarSummary(); renderCatas();
+}
+
+// ========== INIT ==========
+document.addEventListener('DOMContentLoaded', () => {
+  updateStats();
+  updateAllBadges();
+  updateStorageInfo();
+});
+</script>
+</body>
+</html>
+HTML_EOF
+echo "File written: $(wc -c < /home/claude/brett_v3.html) bytes, $(wc -l < /home/claude/brett_v3.html) lines"
+Salida
+
+Command argument is 165_922 bytes, exceeding the 100_000-byte per-argument limit. For large content, pipe via stdin or use a file-write API instead of embedding the content inline in the command. Argument preview: 'cat > /home/claude/brett_v3.html << \'HTML_EOF\'\n<!DOCTYPE html>\n<html lang="es">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">\n'
+Listo
